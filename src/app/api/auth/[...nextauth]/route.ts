@@ -36,6 +36,10 @@ const handler = NextAuth({
     pages: {
         signIn: "/login",
     },
+    secret: process.env.NEXTAUTH_SECRET || "development-secret-key-change-in-production",
+    session: {
+        strategy: "jwt",
+    },
     theme: {
         colorScheme: "dark",
     },
