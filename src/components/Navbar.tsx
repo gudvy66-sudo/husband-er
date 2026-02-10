@@ -72,35 +72,36 @@ export default function Navbar() {
             text-decoration: none;
             color: #ccc;
             font-weight: 600;
-            font-size: 0.95rem;
+            font-size: 0.9rem; /* Slightly smaller for balance */
             transition: color 0.2s;
             cursor: pointer;
             background: none;
             border: none;
             display: flex;
             align-items: center;
-            gap: 6px; /* Space between icon and text */
-            height: 40px; /* Fixed height touch target */
+            gap: 6px;
+            height: 32px; /* Set same height as button */
             line-height: 1;
         }
 
         .btn-secondary {
             border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 0 20px; /* Use horizontal padding only with fixed height */
+            padding: 0 16px; /* Reduced padding */
             border-radius: 20px;
-            height: 36px;
+            height: 32px; /* Reduced height to match text base */
+            font-size: 0.85rem; /* Match font size */
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
-        /* Mobile Styles (from mobile.css) */
+        /* Mobile Styles */
         @media (max-width: 768px) {
             .navbar {
                 padding: 0 16px !important;
                 flex-wrap: nowrap !important;
                 gap: 6px;
-                height: 60px !important;
+                height: 56px !important; /* Slightly smaller navbar */
             }
 
             .logo {
@@ -111,14 +112,15 @@ export default function Navbar() {
 
             .nav-link {
                 font-size: 0.75rem !important;
-                padding: 0 12px !important;
+                padding: 0 8px !important;
                 white-space: nowrap;
-                height: 32px !important;
+                height: 28px !important; /* Smaller touch target visual, but hit area remains */
             }
             
             .btn-secondary {
-                height: 32px !important;
-                padding: 0 14px !important;
+                height: 28px !important;
+                padding: 0 12px !important;
+                font-size: 0.75rem !important;
             }
         }
       `}</style>
