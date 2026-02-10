@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useSession, signOut } from "next-auth/react";
 
 export default function Home() {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
 
   return (
     <>
@@ -15,7 +15,10 @@ export default function Home() {
           <span>🚨</span> 남편응급실.
         </Link>
         <div style={{ display: "flex", gap: "20px", alignItems: "center" }}>
-          {session ? (
+          {status === "loading" ? (
+            /* Loading Placeholder */
+            <div style={{ width: "100px", height: "30px" }}></div>
+          ) : session ? (
             <>
               <Link href="/community" className="nav-link" style={{ color: "var(--primary)" }}>
                 📋 게시판
