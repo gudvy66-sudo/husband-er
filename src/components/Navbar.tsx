@@ -41,7 +41,7 @@ export default function Navbar() {
 
             <style jsx>{`
         .navbar {
-            padding: 20px 40px;
+            padding: 16px 40px;
             background: rgba(18, 18, 18, 0.8);
             backdrop-filter: blur(12px);
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
@@ -53,16 +53,19 @@ export default function Navbar() {
             left: 0;
             right: 0;
             z-index: 1000;
+            height: 70px; /* Fixed height for consistency */
         }
 
         .logo {
-            font-size: 1.5rem;
+            font-size: 1.4rem;
             font-weight: 800;
             color: var(--primary);
             text-decoration: none;
             display: flex;
             align-items: center;
             gap: 8px;
+            line-height: 1; /* Reset line-height */
+            height: 100%;
         }
 
         .nav-link {
@@ -74,29 +77,30 @@ export default function Navbar() {
             cursor: pointer;
             background: none;
             border: none;
-        }
-
-        .nav-link:hover {
-            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 6px; /* Space between icon and text */
+            height: 40px; /* Fixed height touch target */
+            line-height: 1;
         }
 
         .btn-secondary {
             border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 8px 16px;
+            padding: 0 20px; /* Use horizontal padding only with fixed height */
             border-radius: 20px;
-        }
-
-        .btn-secondary:hover {
-            border-color: #fff;
-            background: rgba(255, 255, 255, 0.1);
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         /* Mobile Styles (from mobile.css) */
         @media (max-width: 768px) {
             .navbar {
-                padding: 10px 12px !important;
+                padding: 0 16px !important;
                 flex-wrap: nowrap !important;
                 gap: 6px;
+                height: 60px !important;
             }
 
             .logo {
@@ -107,8 +111,14 @@ export default function Navbar() {
 
             .nav-link {
                 font-size: 0.75rem !important;
-                padding: 6px 10px !important;
+                padding: 0 12px !important;
                 white-space: nowrap;
+                height: 32px !important;
+            }
+            
+            .btn-secondary {
+                height: 32px !important;
+                padding: 0 14px !important;
             }
         }
       `}</style>
