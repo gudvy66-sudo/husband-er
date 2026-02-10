@@ -1,6 +1,7 @@
 @import "./post-styles.css";
 @import "./detail.css";
 @import "./write/write.css";
+@import "./mobile.css";
 
 /* Global Reset */
 :root {
