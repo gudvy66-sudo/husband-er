@@ -20,6 +20,9 @@ export default function Home() {
               <Link href="/community" className="nav-link" style={{ color: "var(--primary)" }}>
                 📋 게시판
               </Link>
+              <Link href="/profile" className="nav-link" style={{ color: "#FFD700" }}>
+                🏆 내정보
+              </Link>
               <button
                 onClick={() => signOut({ callbackUrl: "/" })}
                 className="nav-link btn-secondary"
