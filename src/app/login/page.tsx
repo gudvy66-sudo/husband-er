@@ -11,13 +11,12 @@ export default function LoginPage() {
     setIsLoading(true);
     // Simulate API delay for UX
     setTimeout(async () => {
-      // For now, these just redirect or show an alert. Real implementation needs API keys.
-      if (provider === "kakao" || provider === "naver") {
-        alert("🔒 [준비 중] 카카오/네이버 개발자 키 세팅이 필요합니다! \n지금은 '테스트 로그인'으로 입장하세요.");
-        setIsLoading(false);
-      } else {
-        await signIn("credentials", { username: "admin", password: "admin", callbackUrl: "/exam" });
-      }
+      // For demo/testing purposes, all login methods work!
+      await signIn("credentials", {
+        username: `${provider}_user`,
+        password: `${provider}_user`,
+        callbackUrl: "/exam"
+      });
     }, 800);
   };
 
@@ -38,7 +37,7 @@ export default function LoginPage() {
             onClick={() => handleMockLogin("kakao")}
             disabled={isLoading}
           >
-            <span className="icon">💬</span> 카카오로 3초 만에 시작
+            <span className="icon">💬</span> 카카오로 3초 만에 시작 (테스트)
           </button>
 
           <button
@@ -46,7 +45,7 @@ export default function LoginPage() {
             onClick={() => handleMockLogin("naver")}
             disabled={isLoading}
           >
-            <span className="icon">🇳</span> 네이버로 시작하기
+            <span className="icon">🇳</span> 네이버로 시작하기 (테스트)
           </button>
         </div>
 
