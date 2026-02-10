@@ -2,46 +2,10 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useSession, signOut } from "next-auth/react";
 
 export default function Home() {
-  const { data: session, status } = useSession();
-
   return (
     <>
-      {/* Navigation */}
-      <nav className="navbar">
-        <Link href="/" className="logo">
-          <span>🚨</span> 남편응급실.
-        </Link>
-        <div style={{ display: "flex", gap: "20px", alignItems: "center" }}>
-          {status === "loading" ? (
-            /* Loading Placeholder */
-            <div style={{ width: "100px", height: "30px" }}></div>
-          ) : session ? (
-            <>
-              <Link href="/community" className="nav-link" style={{ color: "var(--primary)" }}>
-                📋 게시판
-              </Link>
-              <Link href="/profile" className="nav-link" style={{ color: "#FFD700" }}>
-                🏆 내정보
-              </Link>
-              <button
-                onClick={() => signOut({ callbackUrl: "/" })}
-                className="nav-link btn-secondary"
-                style={{ padding: "8px 16px", borderRadius: "20px", fontSize: "0.85rem", border: "1px solid #444" }}
-              >
-                🚪 로그아웃
-              </button>
-            </>
-          ) : (
-            <Link href="/login" className="nav-link btn-secondary" style={{ padding: "8px 16px", borderRadius: "20px", fontSize: "0.85rem", border: "1px solid #444" }}>
-              🔑 로그인 / 회원가입
-            </Link>
-          )}
-        </div>
-      </nav>
-
       <main className="container flex-col">
         {/* Hero Section */}
         <section className="hero-section">

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Noto_Sans_KR } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/Providers";
+import Navbar from "@/components/Navbar";
 
 const notoSansKr = Noto_Sans_KR({
   subsets: ["latin"],
@@ -23,6 +24,7 @@ export default function RootLayout({
     <html lang="ko">
       <body className={`${notoSansKr.variable}`}>
         <Providers>
+          <Navbar />
           {children}
         </Providers>
       </body>
