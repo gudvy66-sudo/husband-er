@@ -99,17 +99,22 @@ export default function ProfilePage() {
       </div>
 
       {/* Stats */}
+      {/* Stats */}
       <div className="stats-grid">
         <div className="stat-card">
           <div className="stat-value">{myPosts.length}</div>
           <div className="stat-label">작성 글</div>
         </div>
         <div className="stat-card">
-          <div className="stat-value">0</div>
-          <div className="stat-label">댓글</div>
+          <div className="stat-value">
+            {myPosts.reduce((sum, post) => sum + (post.views || 0), 0)}
+          </div>
+          <div className="stat-label">총 조회수</div>
         </div>
         <div className="stat-card">
-          <div className="stat-value">0</div>
+          <div className="stat-value">
+            {myPosts.reduce((sum, post) => sum + (post.likes || 0), 0)}
+          </div>
           <div className="stat-label">받은 좋아요</div>
         </div>
       </div>

@@ -3,15 +3,33 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
-import { useMockStore } from "@/hooks/useMockStore";
+import { useState, useEffect } from "react";
 
 function HotPostsList({ session }: { session: any }) {
-  const { posts, isLoaded } = useMockStore();
+  const [posts, setPosts] = useState<any[]>([]);
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  useEffect(() => {
+    const fetchHotPosts = async () => {
+      try {
+        const { collection, query, orderBy, limit, getDocs } = await import("firebase/firestore");
+        const { db } = await import("@/lib/firebase");
+
+        // Get top 5 posts by views
+        const q = query(collection(db, "posts"), orderBy("views", "desc"), limit(5));
+        const snapshot = await getDocs(q);
+        const loadedPosts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        setPosts(loadedPosts);
+      } catch (e) {
+        console.error("Error fetching hot posts:", e);
+      } finally {
+        setIsLoaded(true);
+      }
+    };
+    fetchHotPosts();
+  }, []);
 
   if (!isLoaded) return <div style={{ color: "white", textAlign: "center", padding: "20px" }}>데이터 로딩 중...</div>;
-
-  // Sort by views DESC and take top 5
-  const hotPosts = [...posts].sort((a, b) => b.views - a.views).slice(0, 5);
 
   const getBadgeType = (category: string) => {
     switch (category) {
@@ -34,17 +52,20 @@ function HotPostsList({ session }: { session: any }) {
   return (
     <>
       <ul className="post-list">
-        {hotPosts.map((post) => (
+        {posts.length > 0 ? posts.map((post) => (
           <li key={post.id} className="post-item">
             <span className={`post-badge ${getBadgeType(post.category)}`}>{getKoreanCategory(post.category)}</span>
             <Link href={session ? `/community/${post.id}` : "/login"} className="post-link">
               <span className="post-title">{post.title}</span>
             </Link>
-            <span className="post-meta">댓글 {post.comments} · 조회 {post.views}</span>
+            <span className="post-meta">댓글 {post.commentCount || 0} · 조회 {post.views || 0}</span>
           </li>
-        ))}
+        )) : (
+          <li className="post-item" style={{ justifyContent: 'center', color: '#888' }}>
+            아직 게시글이 없습니다
+          </li>
+        )}
         {/* Dummy Secret Post for non-logged in users illusion */}
-        {/* If logged in, maybe show one more real post or just keep it clean. Let's keep the secret teaser if not logged in */}
         {!session && (
           <li className="post-item blur-item">
             <span className="post-badge secret">비밀</span>

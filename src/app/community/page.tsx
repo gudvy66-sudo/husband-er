@@ -130,31 +130,45 @@ function CommunityContent() {
         </button>
       </div>
 
-      <div className="post-list-wrapper">
+      <div className="post-list-wrapper" style={{ position: 'relative' }}>
         {loading ? (
           <div className="empty-state">
             <p>데이터를 불러오는 중입니다...</p>
           </div>
         ) : filteredPosts.length > 0 ? (
-          <ul className="post-list">
-            {filteredPosts.map((post) => (
-              <li key={post.id} className="post-item">
-                <span className={`post-badge ${getBadgeType(post.category)}`}>
-                  {getKoreanCategory(post.category)}
-                </span>
-
-                <Link href={session ? `/community/${post.id}` : "/login"} className="post-link">
-                  <span className="post-title">{post.title}</span>
-                </Link>
-                <div className="post-info">
-                  <span className="author">{post.authorName || "익명"}</span>
-                  <span className="meta">
-                    👀 {post.views || 0} · 💬 {post.commentCount || 0} · {formatDate(post.createdAt)}
+          <>
+            <ul className="post-list">
+              {(session ? filteredPosts : filteredPosts.slice(0, 3)).map((post) => (
+                <li key={post.id} className="post-item">
+                  <span className={`post-badge ${getBadgeType(post.category)}`}>
+                    {getKoreanCategory(post.category)}
                   </span>
+
+                  <Link href={session ? `/community/${post.id}` : "/login"} className="post-link">
+                    <span className="post-title">{post.title}</span>
+                  </Link>
+                  <div className="post-info">
+                    <span className="author">{post.authorName || "익명"}</span>
+                    <span className="meta">
+                      👀 {post.views || 0} · 💬 {post.commentCount || 0} · {formatDate(post.createdAt)}
+                    </span>
+                  </div>
+                </li>
+              ))}
+            </ul>
+            {!session && filteredPosts.length > 3 && (
+              <div className="community-login-wall">
+                <div className="community-login-cta">
+                  <span style={{ fontSize: '2rem' }}>🔒</span>
+                  <h3>나머지 {filteredPosts.length - 3}개 글이 더 있습니다</h3>
+                  <p>로그인하면 전체 게시판을 이용할 수 있어요</p>
+                  <Link href="/login" className="btn btn-primary btn-sm">
+                    🚑 3초 만에 로그인하기
+                  </Link>
                 </div>
-              </li>
-            ))}
-          </ul>
+              </div>
+            )}
+          </>
         ) : (
           <div className="empty-state">
             <p>📭 아직 등록된 글이 없습니다. 첫 번째 구조 요청을 보내보세요!</p>
@@ -281,6 +295,29 @@ function CommunityContent() {
             padding: 40px;
             text-align: center;
             color: #666;
+        }
+
+        .community-login-wall {
+            padding: 40px 20px;
+            background: linear-gradient(to bottom, rgba(30, 30, 30, 0), rgba(30, 30, 30, 0.98) 30%);
+            text-align: center;
+            margin-top: -20px;
+        }
+        .community-login-cta {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+        .community-login-cta h3 {
+            font-size: 1.1rem;
+            color: #fff;
+            margin: 0;
+        }
+        .community-login-cta p {
+            font-size: 0.9rem;
+            color: #888;
+            margin: 0;
         }
 
         @media (max-width: 480px) {
