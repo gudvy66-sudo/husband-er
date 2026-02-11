@@ -222,6 +222,26 @@ export default function PostDetail({ params }: { params: Promise<{ id: string }>
     alert("👍 댓글에 공감했습니다! (MVP 기능)");
   };
 
+  const handleDelete = async () => {
+    if (!confirm("정말 이 글을 삭제하시겠습니까?\n삭제된 글은 복구할 수 없습니다.")) return;
+
+    try {
+      const { doc, deleteDoc } = await import("firebase/firestore");
+      const { db } = await import("@/lib/firebase");
+
+      await deleteDoc(doc(db, "posts", unwrappedParams.id));
+      alert("🗑️ 게시글이 삭제되었습니다.");
+      router.push("/community");
+    } catch (error) {
+      console.error("Error deleting post:", error);
+      alert("삭제 중 오류가 발생했습니다.");
+    }
+  };
+
+  const handleEdit = () => {
+    router.push(`/write?id=${unwrappedParams.id}`);
+  };
+
   const formatDate = (timestamp: any) => {
     if (!timestamp) return "";
     const date = new Date(timestamp.seconds * 1000);
@@ -243,6 +263,7 @@ export default function PostDetail({ params }: { params: Promise<{ id: string }>
   }
 
   const isLoggedIn = !!session;
+  const isAuthor = session?.user && (session.user as any).id === post.authorId;
 
   return (
     <div className="container" style={{ paddingTop: "100px", paddingBottom: "60px", maxWidth: "800px" }}>
@@ -310,6 +331,17 @@ export default function PostDetail({ params }: { params: Promise<{ id: string }>
           >
             <span>🚨</span> 신고
           </button>
+
+          {isAuthor && (
+            <>
+              <button className="inter-btn" onClick={handleEdit} style={{ marginLeft: 'auto' }}>
+                ✏️ 수정
+              </button>
+              <button className="inter-btn" onClick={handleDelete} style={{ color: '#ff4757', borderColor: '#ff4757' }}>
+                🗑️ 삭제
+              </button>
+            </>
+          )}
         </div>
 
         {/* Comment Section */}
