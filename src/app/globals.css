@@ -181,6 +181,8 @@ a {
   max-width: 1200px;
   margin-left: auto;
   margin-right: auto;
+  justify-content: center;
+  /* Center cards if they don't fill width */
   animation: fadeIn 1s ease-out 0.3s backwards;
 }
 

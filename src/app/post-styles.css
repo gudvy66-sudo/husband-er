@@ -193,6 +193,8 @@
 }
 
 .overlay-text {
+    display: none;
+    /* Hide text as requested */
     color: #fff;
     font-size: 0.95rem;
     margin-bottom: 16px;
