@@ -121,9 +121,33 @@ export default function PostDetail({ params }: { params: Promise<{ id: string }>
   };
 
   const handleShare = () => {
-    navigator.clipboard.writeText(window.location.href);
-    setShowToast(true);
-    setTimeout(() => setShowToast(false), 2500);
+    const url = window.location.href;
+
+    // Fallback for HTTP (navigator.clipboard only works on HTTPS)
+    const copyToClipboard = (text: string) => {
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(text);
+      } else {
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        textarea.style.position = 'fixed';
+        textarea.style.left = '-9999px';
+        document.body.appendChild(textarea);
+        textarea.focus();
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+      }
+    };
+
+    try {
+      copyToClipboard(url);
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 2500);
+    } catch (e) {
+      // Last resort: prompt user to copy manually
+      prompt("링크를 복사하세요:", url);
+    }
   };
 
   const handleCommentSubmit = async (e: React.FormEvent) => {
