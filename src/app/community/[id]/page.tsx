@@ -267,9 +267,7 @@ export default function PostDetail({ params }: { params: Promise<{ id: string }>
 
   return (
     <div className="container" style={{ paddingTop: "100px", paddingBottom: "60px", maxWidth: "800px" }}>
-      <button onClick={() => router.push('/community')} className="back-btn">
-        <span style={{ marginRight: "8px" }}>↩</span> 목록으로 돌아가기
-      </button>
+
 
       {/* Toast Notification */}
       {showToast && (
@@ -342,6 +340,17 @@ export default function PostDetail({ params }: { params: Promise<{ id: string }>
               </button>
             </>
           )}
+        </div>
+
+        {/* Back to List Button (Bottom) */}
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '40px' }}>
+          <button
+            onClick={() => router.push('/community')}
+            className="btn btn-secondary"
+            style={{ padding: '12px 32px', borderRadius: '50px' }}
+          >
+            📋 목록으로 돌아가기
+          </button>
         </div>
 
         {/* Comment Section */}
