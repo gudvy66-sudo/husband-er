@@ -12,9 +12,11 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(true);
 
   // Redirect if not logged in
-  if (!session) {
-    if (typeof window !== "undefined") router.push("/login");
-  }
+  useEffect(() => {
+    if (session === null) {
+      router.push("/login");
+    }
+  }, [session, router]);
 
   useEffect(() => {
     const fetchMyPosts = async () => {
@@ -25,9 +27,6 @@ export default function ProfilePage() {
         const { db } = await import("@/lib/firebase");
 
         // The user id in session might be under 'id' or 'sub' or just we use email if id not present
-        // adjusting based on typical NextAuth + Firebase
-        // Assuming session.user has an id or we use email. Let's try to match authorId.
-        // In write page we used: authorId: (session.user as any).id
         const userId = (session.user as any).id;
 
         if (!userId) {
@@ -56,19 +55,10 @@ export default function ProfilePage() {
       }
     };
 
-    if (session) {
+    if (session?.user) {
       fetchMyPosts();
     }
   }, [session]);
-
-  // Get user's rank from session (mock for now)
-  const userRank = {
-    title: "생존의 달인",
-    level: "Survival Master",
-    score: 300,
-    icon: "🏆",
-    color: "#FFD700"
-  };
 
   if (!session) return null;
 
@@ -85,20 +75,9 @@ export default function ProfilePage() {
         <div className="avatar-large">👤</div>
         <h2 className="username">{session.user?.name || "익명의 유부남"}</h2>
         <p className="user-email">{session.user?.email}</p>
-
-        {/* Rank Badge */}
-        <div className="rank-badge" style={{ borderColor: userRank.color }}>
-          <span className="rank-icon">{userRank.icon}</span>
-          <div className="rank-info">
-            <span className="rank-title">{userRank.title}</span>
-            <span className="rank-level">{userRank.level}</span>
-          </div>
-        </div>
-
-        <div className="rank-score">시험 점수: {userRank.score}점</div>
+        <p className="user-desc">오늘도 생존을 위해 고군분투하는 당신을 응원합니다.</p>
       </div>
 
-      {/* Stats */}
       {/* Stats */}
       <div className="stats-grid">
         <div className="stat-card">
@@ -137,29 +116,6 @@ export default function ProfilePage() {
           ) : (
             <div style={{ padding: "20px", textAlign: "center", color: "#888" }}>작성한 글이 없습니다.</div>
           )}
-        </div>
-      </div>
-
-      {/* Achievements */}
-      <div className="section">
-        <h3 className="section-title">획득 배지</h3>
-        <div className="badges-grid">
-          <div className="badge-item">
-            <span className="badge-icon">✍️</span>
-            <span className="badge-name">첫 글 작성</span>
-          </div>
-          <div className="badge-item">
-            <span className="badge-icon">💬</span>
-            <span className="badge-name">댓글 달인</span>
-          </div>
-          <div className="badge-item locked">
-            <span className="badge-icon">🏅</span>
-            <span className="badge-name">인기글 작성</span>
-          </div>
-          <div className="badge-item locked">
-            <span className="badge-icon">⭐</span>
-            <span className="badge-name">베스트 글 10개</span>
-          </div>
         </div>
       </div>
 
@@ -235,44 +191,12 @@ export default function ProfilePage() {
         .user-email {
           color: #888;
           font-size: 0.9rem;
-          margin-bottom: 24px;
-        }
-
-        .rank-badge {
-          display: inline-flex;
-          align-items: center;
-          gap: 12px;
-          padding: 12px 24px;
-          border-radius: 50px;
-          background: rgba(255, 215, 0, 0.1);
-          border: 2px solid #FFD700;
           margin-bottom: 12px;
         }
-
-        .rank-icon {
-          font-size: 1.5rem;
-        }
-
-        .rank-info {
-          display: flex;
-          flex-direction: column;
-          align-items: flex-start;
-        }
-
-        .rank-title {
-          font-weight: 700;
-          color: #FFD700;
-          font-size: 1rem;
-        }
-
-        .rank-level {
-          font-size: 0.75rem;
-          color: #ccc;
-        }
-
-        .rank-score {
-          color: #aaa;
-          font-size: 0.9rem;
+        
+        .user-desc {
+            color: #aaa;
+            font-size: 0.95rem;
         }
 
         .stats-grid {
@@ -352,39 +276,6 @@ export default function ProfilePage() {
           font-size: 0.8rem;
         }
 
-        .badges-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-          gap: 16px;
-        }
-
-        .badge-item {
-          background: rgba(18, 18, 18, 0.6);
-          backdrop-filter: blur(24px);
-          border: 1px solid rgba(0, 255, 65, 0.3);
-          border-radius: 12px;
-          padding: 20px;
-          text-align: center;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: 8px;
-        }
-
-        .badge-item.locked {
-          opacity: 0.4;
-          border-color: rgba(255, 255, 255, 0.1);
-        }
-
-        .badge-icon {
-          font-size: 2rem;
-        }
-
-        .badge-name {
-          font-size: 0.85rem;
-          color: #ccc;
-        }
-
         .actions {
           text-align: center;
           margin-top: 40px;
@@ -439,10 +330,6 @@ export default function ProfilePage() {
 
           .stat-value {
             font-size: 1.5rem;
-          }
-
-          .badges-grid {
-            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
           }
         }
 

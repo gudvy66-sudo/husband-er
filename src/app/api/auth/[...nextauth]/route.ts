@@ -49,50 +49,63 @@ const handler = NextAuth({
                 const gender = naverProfile?.response?.gender || (user as any).gender;
 
                 // Gender Check: Must be 'M' (Male)
-                // Naver returns: 'M' (Male), 'F' (Female), 'U' (Unknown)
                 if (gender !== "M") {
-                    // console.log("Blocked: Not a male user", gender);
-                    return "/login?error=GenderAccessDenied"; // Redirect with error
+                    return "/login?error=GenderAccessDenied";
                 }
 
                 try {
                     // Sync User to Firestore
-                    const { doc, getDoc, setDoc, serverTimestamp } = await import("firebase/firestore");
-                    const { db } = await import("@/lib/firebase"); // Dynamic import to avoid build issues
+                    const { doc, getDoc, setDoc, serverTimestamp, updateDoc } = await import("firebase/firestore");
+                    const { db } = await import("@/lib/firebase");
+                    const { generateRandomNickname } = await import("@/utils/nicknameGenerator");
 
                     const userRef = doc(db, "users", user.id);
                     const userSnap = await getDoc(userRef);
 
                     if (!userSnap.exists()) {
-                        // Create New User
+                        // Create New User with Random Nickname
+                        const randomNick = generateRandomNickname();
                         await setDoc(userRef, {
                             uid: user.id,
-                            name: user.name,
+                            name: user.name, // Real name (Keep private)
+                            nickname: randomNick, // Public name
                             email: user.email,
                             image: user.image,
                             gender: gender,
-                            role: "user", // Default
+                            role: "user",
                             status: "active",
                             createdAt: serverTimestamp(),
                             lastLogin: serverTimestamp(),
                         });
+                        // Update session user name to random nickname immediately (hack for first login)
+                        user.name = randomNick;
                     } else {
+                        // Existing User
+                        const userData = userSnap.data();
+
+                        // If no nickname (legacy user), add one
+                        let currentNick = userData.nickname;
+                        if (!currentNick) {
+                            currentNick = generateRandomNickname();
+                            await updateDoc(userRef, { nickname: currentNick });
+                        }
+
                         // Update Last Login
-                        await setDoc(userRef, {
+                        await updateDoc(userRef, {
                             lastLogin: serverTimestamp(),
-                            name: user.name, // Update name if changed
-                            image: user.image
-                        }, { merge: true });
+                            image: user.image // Keep image updated
+                        });
 
                         // Check if banned
-                        if (userSnap.data().status === "banned") {
+                        if (userData.status === "banned") {
                             return "/login?error=BannedUser";
                         }
+
+                        // Use nickname for session
+                        user.name = currentNick;
                     }
                 } catch (error) {
                     console.error("Firestore Sync Error:", error);
-                    // Allow login even if sync fails? Or block?
-                    // Let's allow for now but log error
                 }
             }
             return true;
@@ -102,24 +115,8 @@ const handler = NextAuth({
                 token.id = user.id;
                 token.role = (user as any).role || "user";
                 token.accessToken = account?.access_token;
-
-                // If user is from DB, we might want to fetch role fresh from DB?
-                // For performance, we stick to initial load or rely on session refresh.
-                // But for specific admin checks, we might trust the token for now.
-
-                // If syncing happened in signIn, we don't have the DB role in 'user' object immediately 
-                // unless we fetch it here.
-                // Let's do a quick fetch for role if it's Naver login to ensure role is up-to-date
-                if (account?.provider === "naver") {
-                    try {
-                        const { doc, getDoc } = await import("firebase/firestore");
-                        const { db } = await import("@/lib/firebase");
-                        const userSnap = await getDoc(doc(db, "users", user.id));
-                        if (userSnap.exists()) {
-                            token.role = userSnap.data().role;
-                        }
-                    } catch (e) { }
-                }
+                // Preserve nickname if available in user object (from signIn mutation)
+                if (user.name) token.name = user.name;
             }
             return token;
         },
@@ -127,6 +124,7 @@ const handler = NextAuth({
             if (session.user) {
                 session.user.id = token.id as string;
                 session.user.role = token.role as string;
+                session.user.name = token.name || session.user.name; // Use nickname
             }
             return session;
         },
