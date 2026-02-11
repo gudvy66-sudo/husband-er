@@ -143,43 +143,45 @@ export default function AdminDashboard() {
                         <h3>🚨 실시간 신고 접수</h3>
                         <Link href="/admin/reports" className="btn-more">더보기 &gt;</Link>
                     </div>
-                    <table className="data-table">
-                        <thead>
-                            <tr>
-                                <th>유형</th>
-                                <th>내용/제목</th>
-                                <th>신고자</th>
-                                <th>일시</th>
-                                <th>상태</th>
-                                <th>관리</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {loading ? (
-                                <tr><td colSpan={6} style={{ textAlign: 'center', padding: '20px' }}>로딩 중...</td></tr>
-                            ) : reports.length > 0 ? (
-                                reports.map((report) => (
-                                    <tr key={report.id}>
-                                        <td><span className="badge-type">{report.type || '신고'}</span></td>
-                                        <td className="col-title">{report.reason || report.targetId}</td>
-                                        <td>{report.reporterName || '익명'}</td>
-                                        <td className="col-date">
-                                            {report.createdAt.toLocaleString()}
-                                        </td>
-                                        <td>
-                                            <span className={`status-dot ${report.status === 'pending' ? 'red' : 'gray'}`}></span>
-                                            {report.status === 'pending' ? '대기중' : report.status}
-                                        </td>
-                                        <td>
-                                            <button className="btn-action">확인</button>
-                                        </td>
-                                    </tr>
-                                ))
-                            ) : (
-                                <tr><td colSpan={6} style={{ textAlign: 'center', padding: '20px' }}>접수된 신고가 없습니다.</td></tr>
-                            )}
-                        </tbody>
-                    </table>
+                    <div className="data-table-wrapper">
+                        <table className="data-table">
+                            <thead>
+                                <tr>
+                                    <th>유형</th>
+                                    <th>내용/제목</th>
+                                    <th>신고자</th>
+                                    <th>일시</th>
+                                    <th>상태</th>
+                                    <th>관리</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {loading ? (
+                                    <tr><td colSpan={6} style={{ textAlign: 'center', padding: '20px' }}>로딩 중...</td></tr>
+                                ) : reports.length > 0 ? (
+                                    reports.map((report) => (
+                                        <tr key={report.id}>
+                                            <td><span className="badge-type">{report.type || '신고'}</span></td>
+                                            <td className="col-title">{report.reason || report.targetId}</td>
+                                            <td>{report.reporterName || '익명'}</td>
+                                            <td className="col-date">
+                                                {report.createdAt.toLocaleString()}
+                                            </td>
+                                            <td>
+                                                <span className={`status-dot ${report.status === 'pending' ? 'red' : 'gray'}`}></span>
+                                                {report.status === 'pending' ? '대기중' : report.status}
+                                            </td>
+                                            <td>
+                                                <button className="btn-action">확인</button>
+                                            </td>
+                                        </tr>
+                                    ))
+                                ) : (
+                                    <tr><td colSpan={6} style={{ textAlign: 'center', padding: '20px' }}>접수된 신고가 없습니다.</td></tr>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
 
                 {/* Recent Members Panel (Real) */}
@@ -348,11 +350,19 @@ export default function AdminDashboard() {
                 }
 
                 /* Data Table */
+                .data-table-wrapper {
+                    overflow-x: auto;
+                    margin: 0 -16px;
+                    padding: 0 16px;
+                    -webkit-overflow-scrolling: touch;
+                }
+
                 .data-table {
                     width: 100%;
                     border-collapse: separate;
                     border-spacing: 0;
                     font-size: 0.9rem;
+                    min-width: 600px;
                 }
 
                 .data-table th {
@@ -364,6 +374,7 @@ export default function AdminDashboard() {
                     font-size: 0.75rem;
                     background: #f6f9fc;
                     border-bottom: 1px solid #e9ecef;
+                    white-space: nowrap;
                 }
                 .data-table th:first-child { border-top-left-radius: 8px; }
                 .data-table th:last-child { border-top-right-radius: 8px; }
@@ -373,6 +384,7 @@ export default function AdminDashboard() {
                     border-bottom: 1px solid #f6f9fc;
                     color: #525f7f;
                     vertical-align: middle;
+                    white-space: nowrap;
                 }
                 .data-table tr:hover td { background: #f8f9fe; }
 
@@ -522,6 +534,19 @@ export default function AdminDashboard() {
                 @media (max-width: 768px) {
                     .kpi-grid {
                         grid-template-columns: 1fr;
+                        gap: 16px;
+                    }
+                    .kpi-card {
+                        padding: 20px;
+                    }
+                    .kpi-value {
+                        font-size: 1.5rem;
+                    }
+                    .panel {
+                        padding: 20px;
+                    }
+                    .panel-header h3 {
+                        font-size: 1rem;
                     }
                 }
             `}</style>

@@ -183,9 +183,10 @@ export default function AdminReports() {
                     background: #fff;
                     border-radius: 16px;
                     box-shadow: 0 4px 24px rgba(0,0,0,0.04);
-                    overflow: hidden;
+                    overflow-x: auto; /* Enable horizontal scroll */
                     border: 1px solid rgba(0,0,0,0.02);
                     min-height: 400px;
+                    -webkit-overflow-scrolling: touch;
                 }
                 .loading, .no-data {
                     padding: 60px;
@@ -199,6 +200,7 @@ export default function AdminReports() {
                     border-collapse: separate;
                     border-spacing: 0;
                     font-size: 0.95rem;
+                    min-width: 900px; /* Keep width for scrolling */
                 }
                 .data-table th {
                     background: #f6f9fc;
@@ -210,17 +212,19 @@ export default function AdminReports() {
                     font-size: 0.8rem;
                     letter-spacing: 0.5px;
                     border-bottom: 1px solid #e9ecef;
+                    white-space: nowrap;
                 }
                 .data-table td {
                     padding: 20px 24px;
                     border-bottom: 1px solid #f6f9fc;
                     vertical-align: middle;
                     color: #525f7f;
+                    white-space: nowrap;
                 }
                 .data-table tr:hover td { background: #f8f9fe; }
                 .row-dimmed td { opacity: 0.6; background: #fafafa; }
 
-                .col-content { max-width: 300px; }
+                .col-content { max-width: 300px; white-space: normal; }
                 .reason { font-weight: 600; color: #32325d; margin-bottom: 4px; }
                 .target-id { font-size: 0.8rem; color: #999; font-family: monospace; }
 
@@ -295,6 +299,36 @@ export default function AdminReports() {
                 .icon { font-size: 4rem; margin-bottom: 16px; }
                 .empty-state h3 { font-size: 1.4rem; margin-bottom: 8px; color: #32325d; font-weight: 700; }
                 .empty-state p { color: #8898aa; font-size: 1rem; }
+
+                @media (max-width: 768px) {
+                    .page-header {
+                        flex-direction: column;
+                        align-items: flex-start;
+                        gap: 12px;
+                        margin-bottom: 20px;
+                    }
+                    .title {
+                        font-size: 1.3rem;
+                    }
+                    .btn-refresh {
+                        padding: 8px 16px;
+                        font-size: 0.9rem;
+                    }
+                    .table-container {
+                        border-radius: 12px;
+                    }
+                    .loading, .no-data {
+                        padding: 40px;
+                    }
+                    .action-buttons {
+                        flex-direction: column;
+                        gap: 4px;
+                    }
+                    .btn-resolve, .btn-dismiss, .btn-delete {
+                        width: 100%;
+                        text-align: center;
+                    }
+                }
             `}</style>
         </div>
     );

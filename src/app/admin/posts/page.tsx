@@ -177,8 +177,9 @@ export default function AdminPosts() {
                     background: #fff;
                     border-radius: 16px;
                     box-shadow: 0 4px 24px rgba(0,0,0,0.04);
-                    overflow: hidden;
+                    overflow-x: auto; /* Enable horizontal scroll */
                     border: 1px solid rgba(0,0,0,0.02);
+                    -webkit-overflow-scrolling: touch;
                 }
                 .loading, .no-data {
                     padding: 60px;
@@ -192,6 +193,7 @@ export default function AdminPosts() {
                     border-collapse: separate;
                     border-spacing: 0;
                     font-size: 0.95rem;
+                    min-width: 800px; /* Keep width for scrolling */
                 }
                 .data-table th {
                     background: #f6f9fc;
@@ -203,12 +205,14 @@ export default function AdminPosts() {
                     font-size: 0.8rem;
                     letter-spacing: 0.5px;
                     border-bottom: 1px solid #e9ecef;
+                    white-space: nowrap;
                 }
                 .data-table td {
                     padding: 20px 24px;
                     border-bottom: 1px solid #f6f9fc;
                     vertical-align: middle;
                     color: #525f7f;
+                    white-space: nowrap;
                 }
                 .data-table tr:hover td { background: #f8f9fe; }
 
@@ -259,6 +263,28 @@ export default function AdminPosts() {
                     color: #fff;
                     border-color: transparent;
                     box-shadow: 0 4px 6px rgba(245, 54, 92, 0.2);
+                }
+
+                @media (max-width: 768px) {
+                    .page-header {
+                        flex-direction: column;
+                        align-items: flex-start;
+                        gap: 12px;
+                        margin-bottom: 20px;
+                    }
+                    .title {
+                        font-size: 1.3rem;
+                    }
+                    .btn-refresh {
+                        padding: 8px 16px;
+                        font-size: 0.9rem;
+                    }
+                    .table-container {
+                        border-radius: 12px;
+                    }
+                    .loading, .no-data {
+                        padding: 40px;
+                    }
                 }
             `}</style>
         </div>
