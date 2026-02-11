@@ -1,8 +1,9 @@
 "use client";
 
 import { useSession } from "next-auth/react";
-
-// Mock Data
+import { useState, useEffect } from "react";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 const kpiData = [
     { label: "총 회원수", value: "1,248", unit: "명", diff: "+14", color: "blue" },
     { label: "오늘 접속자", value: "892", unit: "명", diff: "+5.1%", color: "green" },
@@ -24,7 +25,87 @@ const recentMembers = [
 ];
 
 export default function AdminDashboard() {
-    const { data: session } = useSession();
+    const [stats, setStats] = useState({
+        totalUsers: 0,
+        todayVisitors: 0,
+        totalPosts: 0,
+        pendingReports: 0
+    });
+    const [recentMembers, setRecentMembers] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchDashboardData = async () => {
+            try {
+                // 1. Fetch Users Data
+                const usersRef = collection(db, "users");
+                const usersSnap = await getDocs(usersRef); // Ideally use getCountFromServer for large DBs
+                const totalUsers = usersSnap.size;
+
+                // Calculate Today Visitors (Mocking strictly 'today' logic via client filter for small DB, 
+                // or use where('lastLogin', '>=', today) if index exists)
+                // Let's use client filter for safety without index
+                const todayIndices = new Date();
+                todayIndices.setHours(0, 0, 0, 0);
+
+                let visitorsCount = 0;
+                const membersList: any[] = [];
+
+                usersSnap.forEach(doc => {
+                    const data = doc.data();
+                    // Visitors
+                    if (data.lastLogin?.seconds * 1000 >= todayIndices.getTime()) {
+                        visitorsCount++;
+                    }
+                    // Prepare all members for sorting later (or fetch separately)
+                    membersList.push({ id: doc.id, ...data });
+                });
+
+                // Top 5 Recent Members
+                const sortedMembers = membersList
+                    .sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0))
+                    .slice(0, 5)
+                    .map(m => ({
+                        id: m.id,
+                        name: m.name,
+                        email: m.email,
+                        role: m.role || 'User',
+                        joined: m.createdAt ? new Date(m.createdAt.seconds * 1000).toLocaleDateString() : 'Unknown',
+                        initial: m.name ? m.name[0] : '?'
+                    }));
+
+                setRecentMembers(sortedMembers);
+
+                // 2. Fetch Posts Data
+                // If posts collection doesn't exist yet, it will return size 0, which is fine.
+                const psnap = await getDocs(collection(db, "posts"));
+                const totalPosts = psnap.size;
+
+                setStats({
+                    totalUsers,
+                    todayVisitors: visitorsCount,
+                    totalPosts,
+                    pendingReports: 5 // Keep mock for reports
+                });
+
+            } catch (e) {
+                console.error("Dashboard Fetch Error", e);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        if (session) {
+            fetchDashboardData();
+        }
+    }, [session]);
+
+    const kpiData = [
+        { label: "총 회원수", value: stats.totalUsers.toLocaleString(), unit: "명", diff: "+new", color: "blue" },
+        { label: "오늘 접속자", value: stats.todayVisitors.toLocaleString(), unit: "명", diff: "Today", color: "green" },
+        { label: "총 게시글", value: stats.totalPosts.toLocaleString(), unit: "건", diff: "Accumulated", color: "purple" },
+        { label: "처리 대기 신고", value: stats.pendingReports.toLocaleString(), unit: "건", diff: "-", color: "red" },
+    ];
 
     return (
         <div className="dashboard-container">
@@ -34,13 +115,13 @@ export default function AdminDashboard() {
                     <div key={idx} className={`kpi-card ${item.color}`}>
                         <div className="kpi-label">{item.label}</div>
                         <div className="kpi-value">
-                            {item.value} <span className="unit">{item.unit}</span>
+                            {loading ? "..." : item.value} <span className="unit">{item.unit}</span>
                         </div>
                         <div className="kpi-diff">
                             <span className={item.diff.startsWith('+') ? 'up' : 'down'}>
                                 {item.diff}
                             </span>
-                            <span className="diff-text"> 전일 대비</span>
+                            <span className="diff-text"> {item.diff === 'Today' ? '오늘 기준' : '전일 대비'}</span>
                         </div>
                     </div>
                 ))}
@@ -48,10 +129,10 @@ export default function AdminDashboard() {
 
             {/* Main Dashboard Panels */}
             <div className="panel-grid">
-                {/* Reported Posts Table */}
+                {/* Reported Posts Table (Mock) */}
                 <div className="panel">
                     <div className="panel-header">
-                        <h3>🚨 실시간 신고 접수</h3>
+                        <h3>🚨 실시간 신고 접수 (Mock)</h3>
                         <a href="/admin/reports" className="btn-more">더보기 &gt;</a>
                     </div>
                     <table className="data-table">
@@ -85,26 +166,32 @@ export default function AdminDashboard() {
                     </table>
                 </div>
 
-                {/* Recent Members Panel */}
+                {/* Recent Members Panel (Real) */}
                 <div className="panel side-panel">
                     <div className="panel-header">
                         <h3>👥 신규 가입 회원</h3>
                         <a href="/admin/users" className="btn-more">전체보기</a>
                     </div>
                     <ul className="member-list">
-                        {recentMembers.map((member) => (
-                            <li key={member.id} className="member-item">
-                                <div className="member-avatar">{member.name[0]}</div>
-                                <div className="member-info">
-                                    <div className="name-row">
-                                        <span className="name">{member.name}</span>
-                                        <span className={`role-badge ${member.role === 'VIP' ? 'vip' : ''}`}>{member.role}</span>
-                                    </div>
-                                    <span className="email">{member.email}</span>
-                                </div>
-                                <span className="joined-time">{member.joined}</span>
-                            </li>
-                        ))}
+                        {loading ? <p style={{ padding: '20px', color: '#888' }}>로딩 중...</p> :
+                            recentMembers.length > 0 ? (
+                                recentMembers.map((member) => (
+                                    <li key={member.id} className="member-item">
+                                        <div className="member-avatar">{member.initial}</div>
+                                        <div className="member-info">
+                                            <div className="name-row">
+                                                <span className="name">{member.name}</span>
+                                                <span className={`role-badge ${member.role === 'vip' ? 'vip' : ''}`}>{member.role}</span>
+                                            </div>
+                                            <span className="email">{member.email}</span>
+                                        </div>
+                                        <span className="joined-time">{member.joined}</span>
+                                    </li>
+                                ))
+                            ) : (
+                                <p style={{ padding: '20px', color: '#888' }}>신규 회원이 없습니다.</p>
+                            )
+                        }
                     </ul>
                 </div>
             </div>
