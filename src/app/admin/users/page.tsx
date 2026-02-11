@@ -183,6 +183,7 @@ export default function UserManagement() {
                 )}
             </div>
 
+            <style jsx>{`
             /* Chic Admin Design */
             .admin-page-container {
                 padding: 0 4px;
