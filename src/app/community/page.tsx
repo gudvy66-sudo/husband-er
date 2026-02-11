@@ -1,14 +1,30 @@
-"use client";
-
 import Link from "next/link";
 import { useSession } from "next-auth/react";
-import { useState } from "react";
+import { useState, useEffect, Suspense } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import { useMockStore, Post } from "@/hooks/useMockStore";
 
-export default function Community() {
+function CommunityContent() {
   const { data: session } = useSession();
   const { posts } = useMockStore();
-  const [activeTab, setActiveTab] = useState("all");
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  // Get initial tab from URL or default to 'all'
+  const initialTab = searchParams.get("category") || "all";
+  const [activeTab, setActiveTab] = useState(initialTab);
+
+  // Sync state with URL when params change (e.g. back button)
+  useEffect(() => {
+    const category = searchParams.get("category") || "all";
+    setActiveTab(category);
+  }, [searchParams]);
+
+  const handleTabChange = (tab: string) => {
+    setActiveTab(tab);
+    // Update URL without reloading
+    router.push(`?category=${tab}`, { scroll: false });
+  };
 
   const filteredPosts = activeTab === "all"
     ? posts
@@ -45,31 +61,31 @@ export default function Community() {
       <div className="tabs">
         <button
           className={`tab ${activeTab === "all" ? "active" : ""}`}
-          onClick={() => setActiveTab("all")}
+          onClick={() => handleTabChange("all")}
         >
           전체
         </button>
         <button
           className={`tab ${activeTab === "urgent" ? "active" : ""}`}
-          onClick={() => setActiveTab("urgent")}
+          onClick={() => handleTabChange("urgent")}
         >
           🚨 긴급
         </button>
         <button
           className={`tab ${activeTab === "free" ? "active" : ""}`}
-          onClick={() => setActiveTab("free")}
+          onClick={() => handleTabChange("free")}
         >
           🗣️ 자유
         </button>
         <button
           className={`tab ${activeTab === "question" ? "active" : ""}`}
-          onClick={() => setActiveTab("question")}
+          onClick={() => handleTabChange("question")}
         >
           ❓ 질문
         </button>
         <button
           className={`tab ${activeTab === "secret" ? "active" : ""}`}
-          onClick={() => setActiveTab("secret")}
+          onClick={() => handleTabChange("secret")}
         >
           🔒 비밀
         </button>
@@ -83,6 +99,10 @@ export default function Community() {
                 <span className={`post-badge ${getBadgeType(post.category)}`}>
                   {getKoreanCategory(post.category)}
                 </span>
+                {/* Pass current category in URL so detail page knows where to go back to? 
+                    Actually, router.back() works better if history stack is correct.
+                    But user asked for it specifically. Let's rely on router.push updating history.
+                 */}
                 <Link href={session ? `/community/${post.id}` : "/login"} className="post-link">
                   <span className="post-title">{post.title}</span>
                 </Link>
@@ -214,5 +234,13 @@ export default function Community() {
         }
       `}</style>
     </main>
+  );
+}
+
+export default function Community() {
+  return (
+    <Suspense fallback={<div className="container" style={{ textAlign: 'center', marginTop: '100px' }}>Loading...</div>}>
+      <CommunityContent />
+    </Suspense>
   );
 }

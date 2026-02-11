@@ -1,54 +1,30 @@
 "use client";
-import { use, useState } from "react";
+import { use, useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-
-// Mock Data (Shared with list)
-const MOCK_POSTS = {
-  "1": {
-    id: 1,
-    title: "와이프가 300만 원짜리 명품백 샀는데 저도 플스5 사도 될까요? (급)",
-    content: "형님들, 지금 백화점입니다. 와이프가 카드 긁는 순간 제 머릿속에 '플스5 프로'가 스쳐 지나갔습니다. \n\n이거 공평한 거 아닙니까? 지금 지르면 등짝 스매싱일까요, 아니면 합리적 소비일까요? \n\n솔직히 저도 게임 좀 하고 싶습니다. 육아 스트레스 풀 데가 없어요. 투표 좀 부탁드립니다. \n\n1. 사라 (질러라) \n2. 참아라 (사면 죽는다) \n3. 몰래 중고로 사라",
-    author: "플스마려운놈",
-    date: "10분 전",
-    views: 1240,
-    likes: 56,
-    comments: [
-      { id: 101, user: "생존왕", text: "절대 안 됩니다. '나도 샀으니 너도 사'는 통하지 않습니다. 와이프 꺼는 '필수품'이고 님 꺼는 '장난감' 취급 당합니다. 팩트입니다." },
-      { id: 102, user: "이미죽은자", text: "그냥 사세요. 허락보다 용서가 쉽습니다. 전 이미 샀고 베란다에서 자고 있습니다." },
-      { id: 103, user: "치킨감별사", text: "차라리 그 돈으로 맛있는 거 사먹고 점수 따세요. 플스는 친구 집에서 하시고." }
-    ]
-  },
-  "2": {
-    id: 2,
-    title: "비상금 들켰습니다... 베란다 타일 밑이었는데... 하...",
-    content: "아니 거기를 어떻게 안 거죠? 청소하다가 발견했다는데 말이 됩니까? \n\n3년 동안 모은 450만 원... \n저녁에 압수수색 들어온다는데 어디로 튀어야 합니까? \n\n지금 친구네 집으로 도망칠까 생각 중인데 더 수상해 보이겠죠? \n급합니다. 살려주세요.",
-    author: "타일공",
-    date: "30분 전",
-    views: 3402,
-    likes: 128,
-    comments: [
-      { id: 201, user: "독심술사", text: "일단 무릎 꿇고 '서프라이즈 여행 가려고 모은 거야'라고 우기세요. 안 통하겠지만 10% 정도 감형 가능합니다." }
-    ]
-  },
-  "4": {
-    id: 4,
-    title: "장모님 오신다는데 '야근' 핑계 댈 수 있는 앱 추천 좀...",
-    content: "이번 주말입니다. 도와주십시오. \n\n회사에서 긴급 호출 온 것처럼, 부장님한테 전화 오는 것처럼 알람 울리게 하는 앱 없습니까? \n\n연기력은 자신 있습니다. 타이밍만 맞춰주면 됩니다.",
-    author: "사위1호",
-    date: "2시간 전",
-    views: 890,
-    likes: 34,
-    comments: []
-  }
-};
+import { useSession } from "next-auth/react";
+import { useMockStore, Post } from "@/hooks/useMockStore";
 
 export default function PostDetail({ params }: { params: Promise<{ id: string }> }) {
   const unwrappedParams = use(params);
   const router = useRouter();
-  const post = MOCK_POSTS[unwrappedParams.id as keyof typeof MOCK_POSTS];
-  const [likes, setLikes] = useState(post?.likes || 0);
+  const { data: session } = useSession();
+  const { posts, isLoaded } = useMockStore();
+
+  const [post, setPost] = useState<Post | null>(null);
+  const [likes, setLikes] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
+  const [commentText, setCommentText] = useState("");
+
+  useEffect(() => {
+    if (isLoaded) {
+      const foundPost = posts.find(p => p.id === Number(unwrappedParams.id));
+      if (foundPost) {
+        setPost(foundPost);
+        setLikes(foundPost.likes || 0);
+      }
+    }
+  }, [isLoaded, posts, unwrappedParams.id]);
 
   const handleLike = () => {
     if (isLiked) {
@@ -65,13 +41,24 @@ export default function PostDetail({ params }: { params: Promise<{ id: string }>
     alert("🔗 주소가 복사되었습니다! (친구에게 구조 요청 보내세요)");
   };
 
+  const handleCommentSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!commentText.trim()) return;
+    alert("댓글이 등록되었습니다! (Mock)");
+    setCommentText("");
+    // In a real app, we would update the store here
+  };
+
+  if (!isLoaded) return <div className="container" style={{ paddingTop: "100px", textAlign: "center", color: '#fff' }}>로딩 중...</div>;
+
   if (!post) {
     return (
-      <div className="container" style={{ paddingTop: "100px", textAlign: "center" }}>
-        <h2>존재하지 않는 글입니다. (삭제되었거나 검열당했습니다.)</h2>
-        <Link href="/community" className="btn btn-primary" style={{ marginTop: "20px" }}>
+      <div className="container" style={{ paddingTop: "100px", textAlign: "center", minHeight: "60vh", display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+        <h2 style={{ color: '#fff', marginBottom: '20px' }}>존재하지 않는 글입니다.</h2>
+        <p style={{ color: '#aaa', marginBottom: '30px' }}>삭제되었거나 존재하지 않는 게시글입니다.</p>
+        <button onClick={() => router.back()} className="btn btn-primary">
           목록으로 돌아가기
-        </Link>
+        </button>
       </div>
     );
   }
@@ -84,15 +71,16 @@ export default function PostDetail({ params }: { params: Promise<{ id: string }>
 
       <div className="post-detail-container">
         <div className="detail-header">
-          <span className="cat-badge">잡담</span>
+          <span className="cat-badge">{post.category}</span>
           <h1 className="detail-title">{post.title}</h1>
           <div className="auth-info">
-            <div className="avatar">👤</div>
-            <span>{post.author}</span>
-            <div className="meta-divider"></div>
-            <span>{post.date}</span>
-            <div className="meta-divider"></div>
+            <span className="author">By {post.author}</span>
+            <span className="divider">|</span>
             <span>조회 {post.views}</span>
+            <span className="divider">|</span>
+            <span>댓글 {post.comments}</span>
+            <span className="divider">|</span>
+            <span>{post.createdAt}</span>
           </div>
         </div>
 
@@ -119,29 +107,176 @@ export default function PostDetail({ params }: { params: Promise<{ id: string }>
 
         {/* Comment Section */}
         <div className="comments-section">
-          <h3 className="comments-header">댓글 {post.comments.length}개</h3>
+          <h3 className="comments-header">댓글 {post.comments}개</h3>
 
+          {/* Comment List (Mock for now, as useMockStore doesn't store comments array deeply) */}
           <div className="comment-list">
-            {post.comments.length > 0 ? (
-              post.comments.map((comment) => (
-                <div key={comment.id} className="comment-item">
-                  <span className="comment-author">{comment.user}</span>
-                  <p className="comment-body">{comment.text}</p>
-                </div>
-              ))
-            ) : (
-              <p className="no-comments">가장 먼저 위로의 한마디를 남겨주세요.</p>
-            )}
+            <p className="no-comments">아직 작성된 댓글이 없습니다.</p>
           </div>
 
-          <div className="login-wall">
-            <p>🔒 <strong>로그인</strong>하면 형님들의 특급 조언을 더 볼 수 있습니다.</p>
-            <Link href="/login" className="btn btn-primary btn-sm">
-              3초 만에 로그인하고 댓글 쓰기
-            </Link>
-          </div>
+          {session ? (
+            <form onSubmit={handleCommentSubmit} className="comment-form">
+              <textarea
+                className="comment-input"
+                placeholder="형님의 지혜로운 조언을 남겨주세요."
+                value={commentText}
+                onChange={(e) => setCommentText(e.target.value)}
+              />
+              <button type="submit" className="btn btn-primary btn-comment">등록</button>
+            </form>
+          ) : (
+            <div className="login-wall">
+              <p>🔒 <strong>로그인</strong>하면 형님들의 특급 조언을 더 볼 수 있습니다.</p>
+              <Link href="/login" className="btn btn-primary btn-sm">
+                3초 만에 로그인하고 댓글 쓰기
+              </Link>
+            </div>
+          )}
         </div>
       </div>
+
+      <style jsx>{`
+            .container {
+                color: #fff;
+            }
+            .back-btn {
+                background: none;
+                border: none;
+                color: #aaa;
+                cursor: pointer;
+                font-size: 0.9rem;
+                margin-bottom: 20px;
+                display: flex;
+                align-items: center;
+            }
+            .back-btn:hover {
+                color: #fff;
+            }
+            .post-detail-container {
+                background: rgba(30, 30, 30, 0.6);
+                backdrop-filter: blur(10px);
+                border-radius: 20px;
+                padding: 40px;
+                border: 1px solid rgba(255, 255, 255, 0.05);
+            }
+            .detail-header {
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                padding-bottom: 20px;
+                margin-bottom: 30px;
+            }
+            .cat-badge {
+                display: inline-block;
+                padding: 4px 10px;
+                background: rgba(255, 255, 255, 0.1);
+                border-radius: 20px;
+                font-size: 0.8rem;
+                color: #ccc;
+                margin-bottom: 10px;
+            }
+            .detail-title {
+                font-size: 1.8rem;
+                font-weight: bold;
+                margin-bottom: 15px;
+                line-height: 1.4;
+            }
+            .auth-info {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                color: #888;
+                font-size: 0.9rem;
+            }
+            .author {
+                color: #fff;
+                font-weight: 500;
+            }
+            .divider {
+                color: #444;
+                font-size: 0.8rem;
+            }
+            .detail-content {
+                font-size: 1.1rem;
+                line-height: 1.8;
+                color: #eee;
+                margin-bottom: 40px;
+                min-height: 200px;
+            }
+            .interaction-bar {
+                display: flex;
+                gap: 12px;
+                padding-bottom: 30px;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                margin-bottom: 30px;
+            }
+            .inter-btn {
+                padding: 8px 16px;
+                border-radius: 20px;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                background: rgba(255, 255, 255, 0.05);
+                color: #ccc;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                transition: all 0.2s;
+            }
+            .inter-btn:hover {
+                background: rgba(255, 255, 255, 0.1);
+            }
+            .inter-btn.active {
+                border-color: #ff4757;
+                color: #ff4757;
+                background: rgba(255, 71, 87, 0.1);
+            }
+            
+            .comments-header {
+                font-size: 1.2rem;
+                margin-bottom: 20px;
+            }
+            .no-comments {
+                color: #666;
+                text-align: center;
+                padding: 30px;
+                background: rgba(0,0,0,0.2);
+                border-radius: 10px;
+                margin-bottom: 20px;
+            }
+            .comment-form {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+            }
+            .comment-input {
+                width: 100%;
+                height: 100px;
+                background: rgba(0,0,0,0.3);
+                border: 1px solid rgba(255,255,255,0.1);
+                border-radius: 10px;
+                padding: 15px;
+                color: #fff;
+                font-family: inherit;
+                resize: vertical;
+            }
+            .comment-input:focus {
+                outline: none;
+                border-color: #ff4757;
+            }
+            .btn-comment {
+                align-self: flex-end;
+                padding: 10px 24px;
+            }
+            .login-wall {
+                background: rgba(0,0,0,0.3);
+                padding: 30px;
+                border-radius: 12px;
+                text-align: center;
+                border: 1px dashed rgba(255,255,255,0.1);
+            }
+            .login-wall p {
+                margin-bottom: 15px;
+                color: #aaa;
+            }
+       `}</style>
     </div>
   );
 }

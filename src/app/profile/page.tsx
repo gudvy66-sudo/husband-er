@@ -5,119 +5,119 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 export default function ProfilePage() {
-    const { data: session } = useSession();
-    const router = useRouter();
+  const { data: session } = useSession();
+  const router = useRouter();
 
-    // Redirect if not logged in
-    if (!session) {
-        router.push("/login");
-        return null;
-    }
+  // Redirect if not logged in
+  if (!session) {
+    router.push("/login");
+    return null;
+  }
 
-    // Get user's rank from session (mock for now)
-    const userRank = {
-        title: "생존의 달인",
-        level: "Survival Master",
-        score: 300,
-        icon: "🏆",
-        color: "#FFD700"
-    };
+  // Get user's rank from session (mock for now)
+  const userRank = {
+    title: "생존의 달인",
+    level: "Survival Master",
+    score: 300,
+    icon: "🏆",
+    color: "#FFD700"
+  };
 
-    return (
-        <div className="profile-container">
-            {/* Header */}
-            <div className="profile-header">
-                <Link href="/" className="back-link">← 홈으로</Link>
-                <h1 className="profile-title">마이페이지</h1>
-            </div>
+  return (
+    <div className="profile-container">
+      {/* Header */}
+      <div className="profile-header">
+        <Link href="/" className="back-link">← 홈으로</Link>
+        <h1 className="profile-title">마이페이지</h1>
+      </div>
 
-            {/* User Card */}
-            <div className="user-card">
-                <div className="avatar-large">👤</div>
-                <h2 className="username">{session.user?.name || "익명의 유부남"}</h2>
-                <p className="user-email">{session.user?.email}</p>
+      {/* User Card */}
+      <div className="user-card">
+        <div className="avatar-large">👤</div>
+        <h2 className="username">{session.user?.name || "익명의 유부남"}</h2>
+        <p className="user-email">{session.user?.email}</p>
 
-                {/* Rank Badge */}
-                <div className="rank-badge" style={{ borderColor: userRank.color }}>
-                    <span className="rank-icon">{userRank.icon}</span>
-                    <div className="rank-info">
-                        <span className="rank-title">{userRank.title}</span>
-                        <span className="rank-level">{userRank.level}</span>
-                    </div>
-                </div>
+        {/* Rank Badge */}
+        <div className="rank-badge" style={{ borderColor: userRank.color }}>
+          <span className="rank-icon">{userRank.icon}</span>
+          <div className="rank-info">
+            <span className="rank-title">{userRank.title}</span>
+            <span className="rank-level">{userRank.level}</span>
+          </div>
+        </div>
 
-                <div className="rank-score">시험 점수: {userRank.score}점</div>
-            </div>
+        <div className="rank-score">시험 점수: {userRank.score}점</div>
+      </div>
 
-            {/* Stats */}
-            <div className="stats-grid">
-                <div className="stat-card">
-                    <div className="stat-value">3</div>
-                    <div className="stat-label">작성 글</div>
-                </div>
-                <div className="stat-card">
-                    <div className="stat-value">12</div>
-                    <div className="stat-label">댓글</div>
-                </div>
-                <div className="stat-card">
-                    <div className="stat-value">56</div>
-                    <div className="stat-label">받은 좋아요</div>
-                </div>
-            </div>
+      {/* Stats */}
+      <div className="stats-grid">
+        <div className="stat-card">
+          <div className="stat-value">3</div>
+          <div className="stat-label">작성 글</div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-value">12</div>
+          <div className="stat-label">댓글</div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-value">56</div>
+          <div className="stat-label">받은 좋아요</div>
+        </div>
+      </div>
 
-            {/* My Posts */}
-            <div className="section">
-                <h3 className="section-title">내가 쓴 글</h3>
-                <div className="post-list">
-                    <div className="post-item-small">
-                        <span className="post-title-small">와이프가 300만 원짜리 명품백을...</span>
-                        <span className="post-date">2일 전</span>
-                    </div>
-                    <div className="post-item-small">
-                        <span className="post-title-small">비상금 들켰습니다...</span>
-                        <span className="post-date">5일 전</span>
-                    </div>
-                    <div className="post-item-small">
-                        <span className="post-title-small">장모님 방문 대비책</span>
-                        <span className="post-date">1주 전</span>
-                    </div>
-                </div>
-            </div>
+      {/* My Posts */}
+      <div className="section">
+        <h3 className="section-title">내가 쓴 글</h3>
+        <div className="post-list">
+          <Link href="/community/1" className="post-item-small">
+            <span className="post-title-small">와이프가 300만 원짜리 명품백을...</span>
+            <span className="post-date">2일 전</span>
+          </Link>
+          <Link href="/community/2" className="post-item-small">
+            <span className="post-title-small">비상금 들켰습니다...</span>
+            <span className="post-date">5일 전</span>
+          </Link>
+          <Link href="/community/4" className="post-item-small">
+            <span className="post-title-small">장모님 방문 대비책</span>
+            <span className="post-date">1주 전</span>
+          </Link>
+        </div>
+      </div>
 
-            {/* Achievements */}
-            <div className="section">
-                <h3 className="section-title">획득 배지</h3>
-                <div className="badges-grid">
-                    <div className="badge-item">
-                        <span className="badge-icon">✍️</span>
-                        <span className="badge-name">첫 글 작성</span>
-                    </div>
-                    <div className="badge-item">
-                        <span className="badge-icon">💬</span>
-                        <span className="badge-name">댓글 달인</span>
-                    </div>
-                    <div className="badge-item locked">
-                        <span className="badge-icon">🏅</span>
-                        <span className="badge-name">인기글 작성</span>
-                    </div>
-                    <div className="badge-item locked">
-                        <span className="badge-icon">⭐</span>
-                        <span className="badge-name">베스트 글 10개</span>
-                    </div>
-                </div>
-            </div>
+      {/* Achievements */}
+      <div className="section">
+        <h3 className="section-title">획득 배지</h3>
+        <div className="badges-grid">
+          <div className="badge-item">
+            <span className="badge-icon">✍️</span>
+            <span className="badge-name">첫 글 작성</span>
+          </div>
+          <div className="badge-item">
+            <span className="badge-icon">💬</span>
+            <span className="badge-name">댓글 달인</span>
+          </div>
+          <div className="badge-item locked">
+            <span className="badge-icon">🏅</span>
+            <span className="badge-name">인기글 작성</span>
+          </div>
+          <div className="badge-item locked">
+            <span className="badge-icon">⭐</span>
+            <span className="badge-name">베스트 글 10개</span>
+          </div>
+        </div>
+      </div>
 
-            {/* Actions */}
-            <div className="actions">
-                <button
-                    className="btn-logout"
-                    onClick={() => signOut({ callbackUrl: "/" })}
-                >
-                    🚪 로그아웃
-                </button>
-            </div>
+      {/* Actions */}
+      <div className="actions">
+        <button
+          className="btn-logout"
+          onClick={() => signOut({ callbackUrl: "/" })}
+        >
+          🚪 로그아웃
+        </button>
+      </div>
 
-            <style jsx>{`
+      <style jsx>{`
         .profile-container {
           max-width: 800px;
           margin: 100px auto 60px;
@@ -274,6 +274,8 @@ export default function ProfilePage() {
           border-bottom: 1px solid rgba(255, 255, 255, 0.05);
           cursor: pointer;
           transition: background 0.2s;
+          text-decoration: none;
+          color: inherit;
         }
 
         .post-item-small:last-child {
@@ -388,6 +390,6 @@ export default function ProfilePage() {
           }
         }
       `}</style>
-        </div>
-    );
+    </div>
+  );
 }

@@ -3,6 +3,67 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
+import { useMockStore } from "@/hooks/useMockStore";
+
+function HotPostsList({ session }: { session: any }) {
+  const { posts, isLoaded } = useMockStore();
+
+  if (!isLoaded) return <div style={{ color: "white", textAlign: "center", padding: "20px" }}>데이터 로딩 중...</div>;
+
+  // Sort by views DESC and take top 5
+  const hotPosts = [...posts].sort((a, b) => b.views - a.views).slice(0, 5);
+
+  const getBadgeType = (category: string) => {
+    switch (category) {
+      case 'urgent': return 'emergency';
+      case 'question': return 'normal';
+      case 'secret': return 'secret';
+      default: return 'warning';
+    }
+  };
+
+  const getKoreanCategory = (category: string) => {
+    switch (category) {
+      case 'urgent': return '긴급';
+      case 'question': return '질문';
+      case 'secret': return '비밀';
+      default: return '자유';
+    }
+  };
+
+  return (
+    <>
+      <ul className="post-list">
+        {hotPosts.map((post) => (
+          <li key={post.id} className="post-item">
+            <span className={`post-badge ${getBadgeType(post.category)}`}>{getKoreanCategory(post.category)}</span>
+            <Link href={session ? `/community/${post.id}` : "/login"} className="post-link">
+              <span className="post-title">{post.title}</span>
+            </Link>
+            <span className="post-meta">댓글 {post.comments} · 조회 {post.views}</span>
+          </li>
+        ))}
+        {/* Dummy Secret Post for non-logged in users illusion */}
+        {/* If logged in, maybe show one more real post or just keep it clean. Let's keep the secret teaser if not logged in */}
+        {!session && (
+          <li className="post-item blur-item">
+            <span className="post-badge secret">비밀</span>
+            <span className="post-title">로그인하면 볼 수 있는 19금 생존 비법입니다... (클릭)</span>
+            <span className="post-meta">🔒 잠김</span>
+          </li>
+        )}
+      </ul>
+      {!session && (
+        <div className="blur-overlay">
+          <p>더 많은 생존 꿀팁을 보려면?</p>
+          <Link href="/login" className="btn btn-primary btn-sm">
+            3초 만에 가입하고 전체보기
+          </Link>
+        </div>
+      )}
+    </>
+  );
+}
 
 export default function Home() {
   const { data: session } = useSession();
@@ -46,49 +107,7 @@ export default function Home() {
         <section className="container" style={{ marginTop: "60px", marginBottom: "60px" }}>
           <h2 className="section-title">🔥 실시간 응급실 현황 (HOT)</h2>
           <div className="hot-posts-wrapper">
-            <ul className="post-list">
-              <li className="post-item">
-                <span className="post-badge emergency">긴급</span>
-                <Link href={session ? "/community/1" : "/login"} className="post-link">
-                  <span className="post-title">와이프가 300만 원짜리 명품백 샀는데 저도 플스5 사도 될까요? (급)</span>
-                </Link>
-                <span className="post-meta">댓글 52 · 조회 1.2k</span>
-              </li>
-              <li className="post-item">
-                <span className="post-badge warning">조언</span>
-                <Link href={session ? "/community/2" : "/login"} className="post-link">
-                  <span className="post-title">비상금 들켰습니다... 베란다 타일 밑이었는데... 하...</span>
-                </Link>
-                <span className="post-meta">댓글 89 · 조회 3.4k</span>
-              </li>
-              <li className="post-item">
-                <span className="post-badge best">BEST</span>
-                <Link href={session ? "/community/3" : "/login"} className="post-link">
-                  <span className="post-title">[후기] 로봇청소기인 척 하고 하루 종일 누워있었던 썰 푼다</span>
-                </Link>
-                <span className="post-meta">댓글 120 · 조회 5.1k</span>
-              </li>
-              <li className="post-item">
-                <span className="post-badge normal">질문</span>
-                <Link href={session ? "/community/4" : "/login"} className="post-link">
-                  <span className="post-title">장모님 오신다는데 '회사 비상 호출' 핑계 앱 추천 좀요</span>
-                </Link>
-                <span className="post-meta">댓글 34 · 조회 890</span>
-              </li>
-              <li className="post-item blur-item">
-                <span className="post-badge secret">비밀</span>
-                <span className="post-title">로그인하면 볼 수 있는 19금 생존 비법입니다... (클릭)</span>
-                <span className="post-meta">🔒 잠김</span>
-              </li>
-            </ul>
-            {!session && (
-              <div className="blur-overlay">
-                <p>더 많은 생존 꿀팁을 보려면?</p>
-                <Link href="/login" className="btn btn-primary btn-sm">
-                  3초 만에 가입하고 전체보기
-                </Link>
-              </div>
-            )}
+            <HotPostsList session={session} />
           </div>
         </section>
 
