@@ -24,9 +24,9 @@ export default function Navbar() {
     }, [isMenuOpen]);
 
     return (
-        <nav className="navbar fixed top-0 w-full glass-effect z-50 border-b border-[#333]">
+        <nav className="navbar">
             <div className="navbar-container">
-                <Link href="/" className="logo text-xl font-bold tracking-tighter text-[var(--primary)] animate-pulse" onClick={closeMenu}>
+                <Link href="/" className="logo" onClick={closeMenu}>
                     <span>🚨</span> 남편응급실
                 </Link>
 
@@ -78,6 +78,12 @@ export default function Navbar() {
 
             <style jsx>{`
         .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            width: 100%;
+            z-index: 50;
             background: rgba(18, 18, 18, 0.95);
             backdrop-filter: blur(12px);
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
@@ -94,7 +100,7 @@ export default function Navbar() {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            height: 100%;
+            height: 60px;
         }
 
         .logo {
@@ -106,6 +112,8 @@ export default function Navbar() {
             align-items: center;
             gap: 6px;
             white-space: nowrap;
+            line-height: 1;
+            height: 60px;
         }
 
         /* Desktop Menu */
@@ -227,16 +235,18 @@ export default function Navbar() {
             font-weight: 600;
         }
 
-        /* 📱 Responsive - Sera's Fix #1: Better mobile alignment */
+        /* 📱 Responsive */
         @media (max-width: 768px) {
             .navbar {
                 height: 56px;
             }
             .navbar-container {
                 padding: 0 16px;
+                height: 56px;
             }
             .logo {
                 font-size: 1.1rem;
+                height: 56px;
             }
             .desktop-menu {
                 display: none;
@@ -245,6 +255,9 @@ export default function Navbar() {
                 display: flex;
                 align-items: center;
                 justify-content: center;
+                height: 56px;
+                width: 44px;
+                font-size: 1.6rem;
             }
         }
       `}</style>
