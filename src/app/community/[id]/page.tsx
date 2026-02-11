@@ -311,14 +311,174 @@ export default function PostDetail({ params }: { params: Promise<{ id: string }>
           </div>
         )
       }
-
       <style jsx>{`
-        /* Existing styles... */
-             .container {
+            .container {
                 color: #fff;
             }
-            /* ... (keep existing styles) ... */
+            .back-btn {
+                background: none;
+                border: none;
+                color: #aaa;
+                cursor: pointer;
+                font-size: 0.9rem;
+                margin-bottom: 20px;
+                display: flex;
+                align-items: center;
+            }
+            .back-btn:hover {
+                color: #fff;
+            }
+            .post-detail-container {
+                background: rgba(30, 30, 30, 0.6);
+                backdrop-filter: blur(10px);
+                border-radius: 20px;
+                padding: 40px;
+                border: 1px solid rgba(255, 255, 255, 0.05);
+            }
+            .detail-header {
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                padding-bottom: 20px;
+                margin-bottom: 30px;
+            }
+            .cat-badge {
+                display: inline-block;
+                padding: 4px 10px;
+                background: rgba(255, 255, 255, 0.1);
+                border-radius: 20px;
+                font-size: 0.8rem;
+                color: #ccc;
+                margin-bottom: 10px;
+            }
+            .detail-title {
+                font-size: 1.8rem;
+                font-weight: bold;
+                margin-bottom: 15px;
+                line-height: 1.4;
+            }
+            .auth-info {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                color: #888;
+                font-size: 0.9rem;
+            }
+            .author {
+                color: #fff;
+                font-weight: 500;
+            }
+            .divider {
+                color: #444;
+                font-size: 0.8rem;
+            }
+            .detail-content {
+                font-size: 1.1rem;
+                line-height: 1.8;
+                color: #eee;
+                margin-bottom: 40px;
+                min-height: 200px;
+            }
+            .interaction-bar {
+                display: flex;
+                gap: 12px;
+                padding-bottom: 30px;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                margin-bottom: 30px;
+            }
+            .inter-btn {
+                padding: 8px 16px;
+                border-radius: 20px;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                background: rgba(255, 255, 255, 0.05);
+                color: #ccc;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                transition: all 0.2s;
+            }
+            .inter-btn:hover {
+                background: rgba(255, 255, 255, 0.1);
+            }
+            .inter-btn.active {
+                border-color: #ff4757;
+                color: #ff4757;
+                background: rgba(255, 71, 87, 0.1);
+            }
             
+            .comments-header {
+                font-size: 1.2rem;
+                margin-bottom: 20px;
+            }
+            .comment-list {
+                margin-bottom: 30px;
+            }
+            .comment-item {
+                background: rgba(255,255,255,0.05);
+                padding: 16px;
+                border-radius: 12px;
+                margin-bottom: 12px;
+            }
+            .comment-meta {
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 6px;
+                font-size: 0.85rem;
+                color: #aaa;
+            }
+            .comment-author {
+                color: #eee;
+                font-weight: 600;
+            }
+            .comment-text {
+                font-size: 0.95rem;
+                line-height: 1.5;
+                color: #ddd;
+            }
+
+            .no-comments {
+                color: #666;
+                text-align: center;
+                padding: 30px;
+                background: rgba(0,0,0,0.2);
+                border-radius: 10px;
+                margin-bottom: 20px;
+            }
+            .comment-form {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+            }
+            .comment-input {
+                width: 100%;
+                height: 100px;
+                background: rgba(0,0,0,0.3);
+                border: 1px solid rgba(255,255,255,0.1);
+                border-radius: 10px;
+                padding: 15px;
+                color: #fff;
+                font-family: inherit;
+                resize: vertical;
+            }
+            .comment-input:focus {
+                outline: none;
+                border-color: #ff4757;
+            }
+            .btn-comment {
+                align-self: flex-end;
+                padding: 10px 24px;
+            }
+            .login-wall {
+                background: rgba(0,0,0,0.3);
+                padding: 30px;
+                border-radius: 12px;
+                text-align: center;
+                border: 1px dashed rgba(255,255,255,0.1);
+            }
+            .login-wall p {
+                margin-bottom: 15px;
+                color: #aaa;
+            }
+
             /* Modal Styles */
             .modal-overlay {
                 position: fixed;
