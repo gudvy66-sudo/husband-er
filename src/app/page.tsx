@@ -49,11 +49,18 @@ function HotPostsList({ session }: { session: any }) {
     }
   };
 
+  const displayedPosts = session ? posts : posts.slice(0, 3);
+
   return (
     <>
       <ul className="post-list">
-        {posts.length > 0 ? posts.map((post) => (
-          <Link key={post.id} href={session ? `/community/${post.id}` : "/login"} style={{ textDecoration: 'none', color: 'inherit' }}>
+        {displayedPosts.length > 0 ? displayedPosts.map((post) => (
+          <Link
+            key={post.id}
+            href={session ? `/community/${post.id}` : "/login"}
+            style={{ textDecoration: 'none', color: 'inherit' }}
+            className={!session ? 'blur-item' : ''}
+          >
             <li className="post-item">
               <span className={`post-badge ${getBadgeType(post.category)}`}>{getKoreanCategory(post.category)}</span>
               <span className="post-title">{post.title}</span>
@@ -65,20 +72,12 @@ function HotPostsList({ session }: { session: any }) {
             아직 게시글이 없습니다
           </li>
         )}
-        {/* Dummy Secret Post for non-logged in users */}
-        {!session && (
-          <li className="post-item blur-item">
-            <span className="post-badge secret">비밀</span>
-            <span className="post-title">로그인하면 볼 수 있는 19금 생존 비법입니다... (클릭)</span>
-            <span className="post-meta">🔒 잠김</span>
-          </li>
-        )}
       </ul>
       {!session && (
         <div className="blur-overlay">
-          <p>더 많은 생존 꿀팁을 보려면?</p>
+          <p>내용이 궁금하신가요? 🤫</p>
           <Link href="/login" className="btn btn-primary btn-sm">
-            3초 만에 가입하고 전체보기
+            3초 만에 가입하고 상세 보기
           </Link>
         </div>
       )}
