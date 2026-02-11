@@ -126,22 +126,12 @@ export default function Home() {
         </section>
 
         {/* Hot Community Posts Section */}
-        <section style={{ marginTop: "60px", marginBottom: "60px", width: "100%", display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <section style={{ marginTop: "40px", marginBottom: "40px", width: "100%", display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
 
-          {/* 1. Action Buttons (Top) */}
-          <div style={{ display: 'flex', gap: '12px', marginBottom: '30px' }}>
-            <Link href={session ? "/write" : "/login"} className="btn btn-primary">
-              🚑 지금 바로 입원하기
-            </Link>
-            <Link href="/guide" className="btn btn-secondary">
-              💉 생존 가이드 보기
-            </Link>
-          </div>
+          {/* Section Title */}
+          <h2 className="section-title" style={{ marginBottom: "20px" }}>🔥 실시간 응급실 현황 (HOT)</h2>
 
-          {/* 2. Section Title */}
-          <h2 className="section-title">🔥 실시간 응급실 현황 (HOT)</h2>
-
-          {/* 3. List Box */}
+          {/* List Box */}
           <div className="hot-posts-wrapper">
             <HotPostsList session={session} />
           </div>

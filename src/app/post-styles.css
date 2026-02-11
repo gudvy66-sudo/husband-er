@@ -13,13 +13,14 @@
     border: 1px solid var(--glass-border);
     backdrop-filter: blur(8px);
     border-radius: 16px;
-    padding: 24px;
+    padding: 16px;
+    /* Reduced padding */
     position: relative;
     overflow: hidden;
     width: 100%;
     margin: 0 auto;
-    min-height: 250px;
-    /* Reduced height as requested */
+    min-height: 180px;
+    /* Super compact height */
 }
 
 .post-list {
@@ -31,11 +32,13 @@
 .post-item {
     display: flex;
     align-items: center;
-    padding: 16px;
+    padding: 12px;
+    /* Compact item padding */
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     transition: background 0.2s;
     cursor: pointer;
-    gap: 12px;
+    gap: 8px;
+    /* Reduce gap */
 }
 
 .post-item:last-child {
@@ -47,14 +50,16 @@
 }
 
 .post-badge {
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     font-weight: 800;
-    padding: 4px 8px;
+    padding: 3px 6px;
     border-radius: 4px;
     color: #000;
-    min-width: 50px;
+    min-width: 40px;
     text-align: center;
     white-space: nowrap;
+    flex-shrink: 0;
+    /* Prevent badge shrinking */
 }
 
 .post-badge.emergency {
@@ -85,49 +90,55 @@
     flex-grow: 1;
     font-weight: 500;
     color: var(--text-main);
-    font-size: 1rem;
+    font-size: 0.95rem;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    min-width: 0;
+    /* Important for flex child truncation */
 }
 
 .post-meta {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     color: var(--text-sub);
     margin-left: auto;
     white-space: nowrap;
+    flex-shrink: 0;
 }
 
 @media (max-width: 768px) {
     .hot-posts-wrapper {
-        padding: 16px;
+        padding: 12px;
+        min-height: auto;
+        /* Allow auto height on mobile if needed, or keep compact */
     }
 
     .post-item {
         flex-direction: row;
-        flex-wrap: wrap;
+        /* Force row on mobile too! */
         align-items: center;
         gap: 8px;
+        padding: 10px;
     }
 
     .post-title {
-        font-size: 0.95rem;
-        white-space: normal;
-        /* Allow wrapping on mobile */
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
+        font-size: 0.9rem;
+        /* Force single line on mobile as requested: "긴급 퇴근하고싶어요" style */
+        white-space: nowrap;
         overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100%;
+        /* Ensure truncation works */
     }
 
     .post-meta {
-        width: 100%;
-        /* Force new line */
-        margin-left: 0;
-        margin-top: 2px;
-        text-align: right;
-        font-size: 0.75rem;
-        color: #888;
+        display: none;
+        /* Hide meta (comments/views) on mobile for ultra-compact look, or keep small?
+                        User said "긴급 퇴근하고싶어요" alignment. Meta might clutter.
+                        Let's keep it but very small or hide if conflicting.
+                        Let's hide it on very small screens or keep it minimal.
+                        Actually, let's keep it but make sure it doesn't break layout. */
+        font-size: 0.7rem;
     }
 }
 
@@ -137,12 +148,13 @@
     bottom: 0;
     left: 0;
     width: 100%;
-    height: 100px;
+    height: 80px;
+    /* Shorter overlay */
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: flex-end;
-    padding-bottom: 20px;
+    padding-bottom: 16px;
     background: linear-gradient(to top, rgba(0, 0, 0, 0.95) 10%, transparent 100%);
     z-index: 10;
     border-radius: 0 0 16px 16px;
