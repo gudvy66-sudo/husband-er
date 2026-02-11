@@ -23,11 +23,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             return;
         }
 
-        // 2. Logged in but not Admin -> Kick to Home
+        // 2. Logged in but not Admin -> Redirect to Admin Login (to allow login as admin)
         const userRole = (session?.user as any)?.role;
-        if (userRole !== "admin") {
-            alert("🚫 관리자 권한이 없습니다.");
-            router.push("/");
+        if (session && userRole !== "admin") {
+            router.push("/admin/login");
         }
     }, [status, session, router, pathname]);
 
