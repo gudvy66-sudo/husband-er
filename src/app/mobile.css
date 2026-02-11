@@ -11,18 +11,20 @@
         padding-right: 16px !important;
     }
 
-    /* Navbar Mobile - Prevent Wrapping */
+    /* Navbar Mobile */
     .navbar {
-        padding: 10px 12px !important;
+        height: 56px;
+        padding: 0 !important;
         flex-wrap: nowrap !important;
-        justify-content: space-between;
-        gap: 6px;
     }
 
     .logo {
         font-size: 1.1rem !important;
         white-space: nowrap;
         flex-shrink: 0;
+        height: 56px;
+        display: flex !important;
+        align-items: center !important;
     }
 
     .nav-link {
@@ -230,11 +232,12 @@
     }
 
     .navbar {
-        padding: 10px 12px !important;
+        height: 56px;
+        padding: 0 !important;
     }
 
     .logo {
-        font-size: 1.1rem !important;
+        font-size: 1rem !important;
     }
 
     .btn {

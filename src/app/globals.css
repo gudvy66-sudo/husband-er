@@ -209,31 +209,37 @@ a {
   line-height: 1.5;
 }
 
-/* Navbar */
+/* Navbar - base reset (detailed styles in Navbar.tsx styled-jsx) */
 .navbar {
   position: fixed;
   top: 0;
+  left: 0;
+  right: 0;
   width: 100%;
-  padding: 20px 40px;
+  height: 60px;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  background: rgba(13, 13, 13, 0.8);
+  background: rgba(13, 13, 13, 0.95);
   backdrop-filter: blur(12px);
   z-index: 100;
   border-bottom: 1px solid var(--glass-border);
+  padding: 0;
 }
 
 .logo {
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   font-weight: 800;
   color: var(--text-main);
   letter-spacing: -0.05em;
+  display: flex;
+  align-items: center;
+  height: 100%;
+  line-height: 1;
 }
 
 .logo span {
   color: var(--primary);
-  margin-right: 8px;
+  margin-right: 6px;
 }
 
 .nav-link {
@@ -244,6 +250,15 @@ a {
 
 .nav-link:hover {
   color: var(--text-main);
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    height: 56px;
+  }
+  .logo {
+    font-size: 1.1rem;
+  }
 }
 
 /* Footer */
