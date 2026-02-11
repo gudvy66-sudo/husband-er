@@ -276,10 +276,9 @@ a {
   }
 
   .hero-section {
-    padding-top: 140px;
-    /* Increase padding to prevent overlap with Navbar */
-    align-items: flex-start;
-    /* Align content to start instead of center if needed */
+    padding-top: 200px;
+    /* Increase padding drastically to prevent overlap with Navbar */
+    display: block;
   }
 
   .features-grid {
