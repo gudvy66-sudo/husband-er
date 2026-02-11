@@ -109,36 +109,55 @@
 @media (max-width: 768px) {
     .hot-posts-wrapper {
         padding: 12px;
-        min-height: auto;
-        /* Allow auto height on mobile if needed, or keep compact */
+        min-height: 180px;
     }
 
     .post-item {
+        display: flex;
+        /* Ensure flex */
         flex-direction: row;
-        /* Force row on mobile too! */
+        /* Force row */
+        flex-wrap: nowrap;
+        /* No wrapping */
         align-items: center;
         gap: 8px;
+        /* Gap between elements */
         padding: 10px;
     }
 
+    .post-badge {
+        flex-shrink: 0;
+        /* Badge never shrinks */
+        margin-bottom: 0;
+        /* Reset margins */
+    }
+
     .post-title {
+        flex: 1;
+        /* Take up remaining space */
+        min-width: 0;
+        /* Critical for truncation in flex */
         font-size: 0.9rem;
-        /* Force single line on mobile as requested: "긴급 퇴근하고싶어요" style */
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-        max-width: 100%;
-        /* Ensure truncation works */
+        display: block;
+        /* Ensure block behavior for overflow */
     }
 
     .post-meta {
-        display: none;
-        /* Hide meta (comments/views) on mobile for ultra-compact look, or keep small?
-                        User said "긴급 퇴근하고싶어요" alignment. Meta might clutter.
-                        Let's keep it but very small or hide if conflicting.
-                        Let's hide it on very small screens or keep it minimal.
-                        Actually, let's keep it but make sure it doesn't break layout. */
+        display: block;
+        /* Show meta on mobile */
+        flex-shrink: 0;
+        /* Meta never shrinks */
+        width: auto;
+        /* Auto width */
+        margin-left: auto;
+        /* Push to right if needed, though flex:1 on title does this */
+        margin-top: 0;
+        text-align: right;
         font-size: 0.7rem;
+        color: #888;
     }
 }
 
