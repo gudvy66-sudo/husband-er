@@ -55,7 +55,7 @@ function HotPostsList({ session }: { session: any }) {
 
   return (
     <div style={{ position: 'relative' }}>
-      <ul className="post-list" style={!session ? { paddingBottom: '0px', maskImage: 'linear-gradient(to bottom, black 50%, transparent 98%)', WebkitMaskImage: 'linear-gradient(to bottom, black 50%, transparent 98%)' } : {}}>
+      <ul className="post-list">
         {displayedPosts.length > 0 ? displayedPosts.map((post) => (
           <Link
             key={post.id}
@@ -125,12 +125,27 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Hot Community Posts Section - Enticing Preview */}
-        <section style={{ marginTop: "60px", marginBottom: "60px", width: "100%" }}>
+        {/* Hot Community Posts Section */}
+        <section style={{ marginTop: "60px", marginBottom: "60px", width: "100%", display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+
+          {/* 1. Action Buttons (Top) */}
+          <div style={{ display: 'flex', gap: '12px', marginBottom: '30px' }}>
+            <Link href={session ? "/write" : "/login"} className="btn btn-primary">
+              🚑 지금 바로 입원하기
+            </Link>
+            <Link href="/guide" className="btn btn-secondary">
+              💉 생존 가이드 보기
+            </Link>
+          </div>
+
+          {/* 2. Section Title */}
           <h2 className="section-title">🔥 실시간 응급실 현황 (HOT)</h2>
+
+          {/* 3. List Box */}
           <div className="hot-posts-wrapper">
             <HotPostsList session={session} />
           </div>
+
         </section>
 
         {/* Feature Cards Grid */}
