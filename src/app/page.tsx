@@ -49,38 +49,56 @@ function HotPostsList({ session }: { session: any }) {
     }
   };
 
-  const displayedPosts = session ? posts : posts.slice(0, 3);
+  // 비로그인 시 4개까지만 보여줌 (4번째는 잠금)
+  const visibleLimit = session ? 5 : 4;
+  const displayedPosts = posts.slice(0, visibleLimit);
 
   return (
     <>
       <ul className="post-list">
-        {displayedPosts.length > 0 ? displayedPosts.map((post) => (
-          <Link
-            key={post.id}
-            href={session ? `/community/${post.id}` : "/login"}
-            style={{ textDecoration: 'none', color: 'inherit' }}
-            className={!session ? 'blur-item' : ''}
-          >
-            <li className="post-item">
-              <span className={`post-badge ${getBadgeType(post.category)}`}>{getKoreanCategory(post.category)}</span>
-              <span className="post-title">{post.title}</span>
-              <span className="post-meta">댓글 {post.commentCount || 0} · 조회 {post.views || 0}</span>
-            </li>
-          </Link>
-        )) : (
+        {displayedPosts.length > 0 ? displayedPosts.map((post, index) => {
+          // 4번째 글(index 3)이고, 비로그인 상태일 때 잠금 처리
+          const isLocked = !session && index === 3;
+
+          if (isLocked) {
+            return (
+              <li key={post.id} className="post-item locked">
+                {/* 흐리게 보이는 배경 */}
+                <div className="locked-blur">
+                  <span className={`post-badge ${getBadgeType(post.category)}`}>{getKoreanCategory(post.category)}</span>
+                  <span className="post-title">{post.title}</span>
+                  <span className="post-meta">댓글 {post.commentCount || 0}</span>
+                </div>
+                {/* 오버레이 (버튼) */}
+                <div className="locked-overlay">
+                  <span className="lock-msg">🔒 궁금하면?</span>
+                  <Link href="/login" className="btn-lock-cta">
+                    3초 가입
+                  </Link>
+                </div>
+              </li>
+            );
+          }
+
+          return (
+            <Link
+              key={post.id}
+              href={session ? `/community/${post.id}` : "/login"}
+              style={{ textDecoration: 'none', color: 'inherit' }}
+            >
+              <li className="post-item">
+                <span className={`post-badge ${getBadgeType(post.category)}`}>{getKoreanCategory(post.category)}</span>
+                <span className="post-title">{post.title}</span>
+                <span className="post-meta">댓글 {post.commentCount || 0} · 조회 {post.views || 0}</span>
+              </li>
+            </Link>
+          );
+        }) : (
           <li className="post-item" style={{ justifyContent: 'center', color: '#888' }}>
             아직 게시글이 없습니다
           </li>
         )}
       </ul>
-      {!session && (
-        <div className="blur-overlay">
-          <p>내용이 궁금하신가요? 🤫</p>
-          <Link href="/login" className="btn btn-primary btn-sm">
-            3초 만에 가입하고 상세 보기
-          </Link>
-        </div>
-      )}
     </>
   );
 }
