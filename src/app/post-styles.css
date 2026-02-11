@@ -23,6 +23,8 @@
     margin: 0 auto;
     min-height: 180px;
     /* Super compact height */
+    box-sizing: border-box;
+    /* Ensure padding doesn't affect width */
 }
 
 .post-list {
@@ -34,13 +36,12 @@
 .post-item {
     display: flex;
     align-items: center;
-    padding: 12px;
-    /* Compact item padding */
+    padding: 12px 20px;
+    /* Increased horizontal padding for balance */
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     transition: background 0.2s;
     cursor: pointer;
-    gap: 8px;
-    /* Reduce gap */
+    gap: 12px;
 }
 
 .post-item:last-child {
