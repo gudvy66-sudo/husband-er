@@ -130,19 +130,20 @@
         /* Badge never shrinks */
         margin-bottom: 0;
         /* Reset margins */
+        margin-right: 4px;
+        /* Optional: adjust spacing */
     }
 
     .post-title {
-        flex: 1;
-        /* Take up remaining space */
+        flex: 1 1 auto;
+        /* Grow and shrink */
         min-width: 0;
-        /* Critical for truncation in flex */
+        /* Critical for truncation in flex container */
         font-size: 0.9rem;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-        display: block;
-        /* Ensure block behavior for overflow */
+        /* Remove display: block if it interferes, flex item default is fine */
     }
 
     .post-meta {
@@ -152,12 +153,13 @@
         /* Meta never shrinks */
         width: auto;
         /* Auto width */
-        margin-left: auto;
-        /* Push to right if needed, though flex:1 on title does this */
+        margin-left: 8px;
+        /* Spacing from title, auto margin might push too far */
         margin-top: 0;
         text-align: right;
         font-size: 0.7rem;
         color: #888;
+        white-space: nowrap;
     }
 }
 
