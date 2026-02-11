@@ -49,57 +49,41 @@ function HotPostsList({ session }: { session: any }) {
     }
   };
 
-  // 비로그인 시 4개까지만 보여줌 (4번째는 잠금)
+  // 비로그인 시에도 뒤에 깔린 느낌을 주기 위해 4개 렌더링
   const visibleLimit = session ? 5 : 4;
   const displayedPosts = posts.slice(0, visibleLimit);
 
   return (
-    <>
-      <ul className="post-list">
-        {displayedPosts.length > 0 ? displayedPosts.map((post, index) => {
-          // 4번째 글(index 3)이고, 비로그인 상태일 때 잠금 처리
-          const isLocked = !session && index === 3;
-
-          if (isLocked) {
-            return (
-              <li key={post.id} className="post-item locked">
-                {/* 흐리게 보이는 배경 */}
-                <div className="locked-blur">
-                  <span className={`post-badge ${getBadgeType(post.category)}`}>{getKoreanCategory(post.category)}</span>
-                  <span className="post-title">{post.title}</span>
-                  <span className="post-meta">댓글 {post.commentCount || 0}</span>
-                </div>
-                {/* 오버레이 (버튼) */}
-                <div className="locked-overlay">
-                  <span className="lock-msg">Secret Content</span>
-                  <Link href="/login" className="btn-lock-cta">
-                    3초 만에 확인하기
-                  </Link>
-                </div>
-              </li>
-            );
-          }
-
-          return (
-            <Link
-              key={post.id}
-              href={session ? `/community/${post.id}` : "/login"}
-              style={{ textDecoration: 'none', color: 'inherit' }}
-            >
-              <li className="post-item">
-                <span className={`post-badge ${getBadgeType(post.category)}`}>{getKoreanCategory(post.category)}</span>
-                <span className="post-title">{post.title}</span>
-                <span className="post-meta">댓글 {post.commentCount || 0} · 조회 {post.views || 0}</span>
-              </li>
-            </Link>
-          );
-        }) : (
+    <div style={{ position: 'relative' }}>
+      <ul className="post-list" style={!session ? { paddingBottom: '80px', maskImage: 'linear-gradient(to bottom, black 60%, transparent 100%)', WebkitMaskImage: 'linear-gradient(to bottom, black 60%, transparent 100%)' } : {}}>
+        {displayedPosts.length > 0 ? displayedPosts.map((post) => (
+          <Link
+            key={post.id}
+            href={session ? `/community/${post.id}` : "/login"}
+            style={{ textDecoration: 'none', color: 'inherit' }}
+          >
+            <li className="post-item">
+              <span className={`post-badge ${getBadgeType(post.category)}`}>{getKoreanCategory(post.category)}</span>
+              <span className="post-title">{post.title}</span>
+              <span className="post-meta">댓글 {post.commentCount || 0} · 조회 {post.views || 0}</span>
+            </li>
+          </Link>
+        )) : (
           <li className="post-item" style={{ justifyContent: 'center', color: '#888' }}>
             아직 게시글이 없습니다
           </li>
         )}
       </ul>
-    </>
+
+      {!session && (
+        <div className="blur-overlay">
+          <p className="overlay-text">더 많은 생존 꿀팁을 보려면?</p>
+          <Link href="/login" className="btn-overlay-cta">
+            3초 만에 가입하고 전체보기
+          </Link>
+        </div>
+      )}
+    </div>
   );
 }
 
