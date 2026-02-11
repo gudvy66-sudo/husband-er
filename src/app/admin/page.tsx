@@ -32,9 +32,9 @@ export default function AdminDashboard() {
     useEffect(() => {
         if (status === "loading") return;
 
-        // 1. Not logged in -> Redirect to Login
+        // 1. Not logged in -> Redirect to Admin Login
         if (status === "unauthenticated") {
-            router.push("/login?callbackUrl=/admin");
+            router.push("/admin/login");
             return;
         }
 
