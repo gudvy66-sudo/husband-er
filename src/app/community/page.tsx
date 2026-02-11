@@ -34,12 +34,20 @@ function CommunityContent() {
 
         // Fetch all posts ordered by date (desc)
         // Filtering client-side to avoid "Index Required" errors for now
-        const q = query(collection(db, "posts"), orderBy("createdAt", "desc"));
+        // Fetch all posts (Client-side sorting to bypass index issues)
+        const q = query(collection(db, "posts"));
         const querySnapshot = await getDocs(q);
 
         const loadedPosts: any[] = [];
         querySnapshot.forEach((doc) => {
           loadedPosts.push({ id: doc.id, ...doc.data() });
+        });
+
+        // Client-side Sort (Newest first)
+        loadedPosts.sort((a, b) => {
+          const timeA = a.createdAt?.seconds || 0;
+          const timeB = b.createdAt?.seconds || 0;
+          return timeB - timeA;
         });
 
         setPosts(loadedPosts);
