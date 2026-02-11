@@ -183,154 +183,220 @@ export default function UserManagement() {
                 )}
             </div>
 
-            <style jsx>{`
+            /* Chic Admin Design */
             .admin-page-container {
                 padding: 0 4px;
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
             }
             .page-header {
                 display: flex;
-                justify-content: space-between;
-                align-items: center;
-                margin-bottom: 24px;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
             }
             .title {
-                font-size: 1.5rem;
-                font-weight: 700;
-                color: #333;
+                font - size: 1.8rem;
+            font-weight: 800;
+            color: #2c3e50;
+            letter-spacing: -0.5px;
             }
             .btn-refresh {
-                padding: 8px 16px;
-                background: #fff;
-                border: 1px solid #ddd;
-                border-radius: 6px;
-                cursor: pointer;
-                transition: all 0.2s;
+                padding: 10px 20px;
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #555;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
             }
             .btn-refresh:hover {
-                background: #f5f5f5;
+                background: #f8f9fa;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
             }
 
             .stats-summary {
                 display: flex;
-                gap: 16px;
-                margin-bottom: 24px;
+            gap: 20px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
             }
             .stat-box {
                 background: #fff;
-                padding: 16px 24px;
-                border-radius: 8px;
-                box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-                display: flex;
-                flex-direction: column;
-                min-width: 120px;
+            padding: 24px 32px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+            display: flex;
+            flex-direction: column;
+            min-width: 160px;
+            flex: 1;
+            border: 1px solid rgba(0,0,0,0.03);
+            transition: transform 0.2s;
             }
-            .stat-box.warning .value { color: #e74c3c; }
-            .label { font-size: 0.85rem; color: #888; margin-bottom: 4px; }
-            .value { font-size: 1.5rem; font-weight: 800; color: #333; }
+            .stat-box:hover {
+                transform: translateY(-5px);
+            }
+            .stat-box.warning .value {color: #ff6b6b; }
+            .label {font - size: 0.9rem; color: #8898aa; margin-bottom: 8px; font-weight: 500; }
+            .value {font - size: 2.2rem; font-weight: 800; color: #32325d; }
 
             .table-container {
                 background: #fff;
-                border-radius: 12px;
-                box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-                overflow: hidden;
-                overflow-x: auto;
+            border-radius: 16px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.04);
+            overflow: hidden;
+            border: 1px solid rgba(0,0,0,0.02);
             }
             .loading, .no-data {
-                padding: 40px;
-                text-align: center;
-                color: #888;
+                padding: 60px;
+            text-align: center;
+            color: #adb5bd;
+            font-size: 1.1rem;
             }
-            
+
             .user-table {
                 width: 100%;
-                border-collapse: collapse;
-                font-size: 0.9rem;
+            border-collapse: separate;
+            border-spacing: 0;
+            font-size: 0.95rem;
             }
             .user-table th {
-                background: #f8f9fa;
-                padding: 16px;
-                text-align: left;
-                font-weight: 600;
-                color: #555;
-                border-bottom: 2px solid #eee;
+                background: #f6f9fc;
+            padding: 18px 24px;
+            text-align: left;
+            font-weight: 700;
+            color: #8898aa;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid #e9ecef;
             }
             .user-table td {
-                padding: 16px;
-                border-bottom: 1px solid #f1f1f1;
-                vertical-align: middle;
+                padding: 20px 24px;
+            border-bottom: 1px solid #f6f9fc;
+            vertical-align: middle;
+            color: #525f7f;
             }
-            .user-table tr:hover { background: #fcfcfc; }
-            .row-banned { background: #fff0f0 !important; }
+            .user-table tr:hover td {background: #f8f9fe; }
+            .row-banned td {background: #fff5f5 !important; opacity: 0.7; }
 
             .user-info {
                 display: flex;
-                align-items: center;
-                gap: 10px;
-                font-weight: 600;
-                color: #333;
+            align-items: center;
+            gap: 12px;
+            font-weight: 600;
+            color: #32325d;
             }
             .avatar-circle {
-                width: 32px;
-                height: 32px;
-                background: #eee;
-                border-radius: 50%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 0.8rem;
-                color: #666;
+                width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            color: #fff;
+            font-weight: 700;
+            box-shadow: 0 4px 10px rgba(118, 75, 162, 0.3);
             }
 
             .gender-badge {
-                padding: 4px 8px;
-                border-radius: 4px;
-                font-size: 0.75rem;
-                font-weight: 600;
+                padding: 6px 10px;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 700;
             }
-            .gender-badge.M { background: #e3f2fd; color: #1976d2; }
-            .gender-badge.F { background: #fce4ec; color: #c2185b; }
+            .gender-badge.M {background: #e3f2fd; color: #1565c0; }
+            .gender-badge.F {background: #fce4ec; color: #ad1457; }
 
             .role-select {
-                padding: 6px;
-                border-radius: 4px;
-                border: 1px solid #ddd;
-                font-size: 0.85rem;
+                padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+            font-size: 0.9rem;
+            background-color: #fff;
+            color: #525f7f;
+            cursor: pointer;
+            transition: all 0.2s;
             }
-            .role-select.admin { border-color: #e74c3c; color: #e74c3c; font-weight: bold; }
+            .role-select:focus {
+                border - color: #5e72e4;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(94, 114, 228, 0.1);
+            }
+            .role-select.admin {
+                background: #fff3e0;
+            border-color: #ffe0b2;
+            color: #ef6c00;
+            font-weight: 700; 
+            }
 
             .status-badge {
-                padding: 4px 8px;
-                border-radius: 12px;
-                font-size: 0.8rem;
-                font-weight: 600;
+                padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
             }
-            .status-badge.active { background: #e8f5e9; color: #2e7d32; }
-            .status-badge.banned { background: #ffebee; color: #c62828; }
+            .status-badge::before {
+                content: '';
+            display: block;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            }
+            .status-badge.active {background: #e8f5e9; color: #2dce89; }
+            .status-badge.active::before {background: #2dce89; }
+
+            .status-badge.banned {background: #fee2e2; color: #f5365c; }
+            .status-badge.banned::before {background: #f5365c; }
+
+            .action-buttons {
+                display: flex;
+            gap: 8px;
+            }
 
             .btn-ban {
-                padding: 6px 12px;
-                background: #fff;
-                border: 1px solid #ef9a9a;
-                color: #e53935;
-                border-radius: 4px;
-                cursor: pointer;
-                font-size: 0.8rem;
-                transition: all 0.2s;
+                padding: 8px 16px;
+            background: #fff;
+            border: 1px solid #ffcccc;
+            color: #ff5252;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.2s;
             }
-            .btn-ban:hover { background: #e53935; color: #fff; }
+            .btn-ban:hover {
+                background: #ff5252;
+            color: #fff;
+            box-shadow: 0 4px 10px rgba(255, 82, 82, 0.2);
+            border-color: transparent;
+            }
 
             .btn-unban {
-                padding: 6px 12px;
-                background: #fff;
-                border: 1px solid #a5d6a7;
-                color: #2e7d32;
-                border-radius: 4px;
-                cursor: pointer;
-                font-size: 0.8rem;
-                transition: all 0.2s;
+                padding: 8px 16px;
+            background: #fff;
+            border: 1px solid #b9f6ca;
+            color: #00c853;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.2s;
             }
-            .btn-unban:hover { background: #2e7d32; color: #fff; }
+            .btn-unban:hover {
+                background: #00c853;
+            color: #fff;
+            box-shadow: 0 4px 10px rgba(0, 200, 83, 0.2);
+            border-color: transparent;
+            }
         `}</style>
-        </div>
+        </div >
     );
 }
