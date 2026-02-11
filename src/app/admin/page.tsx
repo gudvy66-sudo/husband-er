@@ -32,12 +32,17 @@ export default function AdminDashboard() {
     useEffect(() => {
         if (status === "loading") return;
 
-        // Check for Admin Role
-        // Note: The 'role' property is added to the session in the NextAuth callback (route.ts)
-        const userRole = (session?.user as any)?.role; // Casting to any to avoid type errors if types aren't fully propagated yet
+        // 1. Not logged in -> Redirect to Login
+        if (status === "unauthenticated") {
+            router.push("/login?callbackUrl=/admin");
+            return;
+        }
 
-        if (!session || userRole !== "admin") {
-            alert("🚫 관리자 전용 구역입니다! (접근 거부)");
+        // 2. Logged in but not Admin -> Access Denied
+        const userRole = (session?.user as any)?.role;
+
+        if (userRole !== "admin") {
+            // alert("🚫 관리자 전용 구역입니다! (접근 거부: " + (session?.user?.name || "Unknown") + ")");
             router.push("/");
         } else {
             setIsAdmin(true);
