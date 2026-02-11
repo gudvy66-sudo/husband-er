@@ -278,6 +278,7 @@ a {
   .hero-section {
     padding-top: 200px;
     /* Increase padding drastically to prevent overlap with Navbar */
+    margin-top: 60px;
     display: block;
   }
 
