@@ -49,48 +49,12 @@ function HotPostsList({ session }: { session: any }) {
     }
   };
 
-  // 🔧 Sera's Icon System
-  const getCategoryIcon = (category: string) => {
-    switch (category) {
-      case 'urgent': // Siren
-        return (
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M12 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4" />
-          </svg>
-        );
-      case 'question': // Help Circle
-        return (
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <circle cx="12" cy="12" r="10"></circle>
-            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
-            <line x1="12" y1="17" x2="12.01" y2="17"></line>
-          </svg>
-        );
-      case 'secret': // Lock
-        return (
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-          </svg>
-        );
-      default: // Free / Message Square
-        return (
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-          </svg>
-        );
-    }
-  };
-
   return (
     <>
       <ul className="post-list">
         {posts.length > 0 ? posts.map((post) => (
           <li key={post.id} className="post-item">
-            <span className={`post-badge ${getBadgeType(post.category)}`} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
-              {getCategoryIcon(post.category)}
-              <span>{getKoreanCategory(post.category)}</span>
-            </span>
+            <span className={`post-badge ${getBadgeType(post.category)}`}>{getKoreanCategory(post.category)}</span>
             <Link href={session ? `/community/${post.id}` : "/login"} className="post-link">
               <span className="post-title">{post.title}</span>
             </Link>
@@ -146,36 +110,16 @@ export default function Home() {
           <div className="btn-group">
             {session ? (
               <Link href="/community" className="btn btn-primary">
-                <span className="btn-icon">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                    <polyline points="14 2 14 8 20 8"></polyline>
-                    <line x1="16" y1="13" x2="8" y2="13"></line>
-                    <line x1="16" y1="17" x2="8" y2="17"></line>
-                    <polyline points="10 9 9 9 8 9"></polyline>
-                  </svg>
-                </span>
-                게시판 입장하기
+                📋 게시판 입장하기
               </Link>
             ) : (
               <Link href="/login" className="btn btn-primary">
-                <span className="btn-icon">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M12 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4" />
-                  </svg>
-                </span>
-                지금 바로 입원하기 (회원가입)
+                🚑 지금 바로 입원하기 (회원가입)
               </Link>
             )}
 
             <Link href="/community" className="btn btn-secondary">
-              <span className="btn-icon">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                  <circle cx="12" cy="12" r="3"></circle>
-                </svg>
-              </span>
-              응급실 현황 보기
+              👀 응급실 현황 보기
             </Link>
           </div>
         </section>
@@ -192,11 +136,7 @@ export default function Home() {
         <div className="features-grid">
           {/* Card 1 */}
           <div className="feature-card">
-            <span className="card-icon">
-              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4" />
-              </svg>
-            </span>
+            <span className="card-icon">🤐</span>
             <h3 className="card-title">익명 보장 상담소</h3>
             <p className="card-desc">
               IP 추적 불가. 완벽한 익명으로 <br />
@@ -206,12 +146,7 @@ export default function Home() {
 
           {/* Card 2 */}
           <div className="feature-card">
-            <span className="card-icon">
-              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
-                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
-              </svg>
-            </span>
+            <span className="card-icon">🛡️</span>
             <h3 className="card-title">비상금 은닉 기술</h3>
             <p className="card-desc">
               베란다 타일 밑부터 PC 본체 안까지, <br />
@@ -221,13 +156,7 @@ export default function Home() {
 
           {/* Card 3 */}
           <div className="feature-card">
-            <span className="card-icon">
-              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                <rect x="2" y="6" width="20" height="12" rx="2" />
-                <path d="M6 12h.01M18 12h.01" />
-                <path d="M9 12a3 3 0 1 0 6 0" />
-              </svg>
-            </span>
+            <span className="card-icon">🎮</span>
             <h3 className="card-title">장비 구매 핑계</h3>
             <p className="card-desc">
               "이거 회사에서 준 거야..." <br />
