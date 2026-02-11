@@ -13,7 +13,9 @@ export default function PostDetail({ params }: { params: Promise<{ id: string }>
   const [post, setPost] = useState<any | null>(null);
   const [comments, setComments] = useState<any[]>([]);
   const [likes, setLikes] = useState(0);
+  const [hasLiked, setHasLiked] = useState(false);
   const [commentText, setCommentText] = useState("");
+  const [showToast, setShowToast] = useState(false);
   const [loading, setLoading] = useState(true);
 
   // New State for Report & Features
@@ -39,6 +41,12 @@ export default function PostDetail({ params }: { params: Promise<{ id: string }>
           const postData = postSnap.data();
           setPost({ id: postSnap.id, ...postData });
           setLikes(postData.likes || 0);
+
+          // Check if current user already liked this post
+          const likedBy = postData.likedBy || [];
+          if (session?.user && likedBy.includes((session.user as any).id)) {
+            setHasLiked(true);
+          }
 
           // Increment views
           // Use a key in sessionStorage to prevent double counting on strict mode/hot reload
@@ -79,16 +87,34 @@ export default function PostDetail({ params }: { params: Promise<{ id: string }>
 
   const handleLike = async () => {
     if (!post) return;
-    // Simple local toggle + DB update (Not preventing multiple likes per user deeply for MVP)
-    // Actually, let's just increment for now as per instruction "Implement handleLike to increment 'likes'"
+    if (!session?.user) {
+      alert("로그인이 필요합니다.");
+      return;
+    }
 
+    const userId = (session.user as any).id;
     try {
-      const { doc, updateDoc, increment } = await import("firebase/firestore");
+      const { doc, updateDoc, increment, arrayUnion, arrayRemove } = await import("firebase/firestore");
       const { db } = await import("@/lib/firebase");
       const postRef = doc(db, "posts", unwrappedParams.id);
 
-      await updateDoc(postRef, { likes: increment(1) });
-      setLikes(prev => prev + 1);
+      if (hasLiked) {
+        // Unlike
+        await updateDoc(postRef, {
+          likes: increment(-1),
+          likedBy: arrayRemove(userId)
+        });
+        setLikes(prev => prev - 1);
+        setHasLiked(false);
+      } else {
+        // Like
+        await updateDoc(postRef, {
+          likes: increment(1),
+          likedBy: arrayUnion(userId)
+        });
+        setLikes(prev => prev + 1);
+        setHasLiked(true);
+      }
     } catch (e) {
       console.error("Like failed", e);
     }
@@ -96,7 +122,8 @@ export default function PostDetail({ params }: { params: Promise<{ id: string }>
 
   const handleShare = () => {
     navigator.clipboard.writeText(window.location.href);
-    alert("🔗 주소가 복사되었습니다! (친구에게 구조 요청 보내세요)");
+    setShowToast(true);
+    setTimeout(() => setShowToast(false), 2500);
   };
 
   const handleCommentSubmit = async (e: React.FormEvent) => {
@@ -191,11 +218,20 @@ export default function PostDetail({ params }: { params: Promise<{ id: string }>
     );
   }
 
+  const isLoggedIn = !!session;
+
   return (
     <div className="container" style={{ paddingTop: "100px", paddingBottom: "60px", maxWidth: "800px" }}>
       <button onClick={() => router.back()} className="back-btn">
         <span style={{ marginRight: "8px" }}>↩</span> 목록으로 돌아가기
       </button>
+
+      {/* Toast Notification */}
+      {showToast && (
+        <div className="toast">
+          🔗 링크가 복사되었습니다!
+        </div>
+      )}
 
       <div className="post-detail-container">
         <div className="detail-header">
@@ -212,18 +248,33 @@ export default function PostDetail({ params }: { params: Promise<{ id: string }>
           </div>
         </div>
 
-        <div className="detail-content">
+        {/* Content with blur for non-logged-in users */}
+        <div className={`detail-content ${!isLoggedIn ? 'blurred' : ''}`}>
           {post.content?.split('\n').map((line: string, i: number) => (
             <p key={i} style={{ minHeight: line ? 'auto' : '1.2em' }}>{line}</p>
           ))}
         </div>
 
+        {/* Blur Overlay for non-logged-in users */}
+        {!isLoggedIn && (
+          <div className="blur-login-overlay">
+            <div className="blur-cta">
+              <span className="blur-icon">🔒</span>
+              <h3>회원 전용 콘텐츠입니다</h3>
+              <p>로그인하면 전체 글과 댓글을 볼 수 있습니다</p>
+              <Link href="/login" className="btn btn-primary btn-sm" style={{ marginTop: '12px' }}>
+                🚑 3초 만에 로그인하기
+              </Link>
+            </div>
+          </div>
+        )}
+
         <div className="interaction-bar">
           <button
-            className="inter-btn"
+            className={`inter-btn ${hasLiked ? 'active' : ''}`}
             onClick={handleLike}
           >
-            <span>❤️</span> 좋아요 {likes}
+            <span>{hasLiked ? '❤️' : '🤍'}</span> 좋아요 {likes}
           </button>
           <button className="inter-btn" onClick={handleShare}>
             <span>🔗</span> 공유하기
@@ -402,7 +453,78 @@ export default function PostDetail({ params }: { params: Promise<{ id: string }>
             .inter-btn.active {
                 border-color: #ff4757;
                 color: #ff4757;
-                background: rgba(255, 71, 87, 0.1);
+                background: rgba(255, 71, 87, 0.15);
+                font-weight: 600;
+            }
+
+            /* Toast Notification */
+            .toast {
+                position: fixed;
+                bottom: 80px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: rgba(0, 255, 65, 0.9);
+                color: #000;
+                padding: 12px 28px;
+                border-radius: 50px;
+                font-weight: 700;
+                font-size: 0.95rem;
+                z-index: 9999;
+                animation: toastIn 0.3s ease-out, toastOut 0.3s ease-in 2.2s;
+                box-shadow: 0 8px 30px rgba(0, 255, 65, 0.3);
+            }
+            @keyframes toastIn {
+                from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+                to { opacity: 1; transform: translateX(-50%) translateY(0); }
+            }
+            @keyframes toastOut {
+                from { opacity: 1; }
+                to { opacity: 0; }
+            }
+
+            /* Blur for non-logged-in users */
+            .detail-content.blurred {
+                max-height: 120px;
+                overflow: hidden;
+                position: relative;
+                filter: blur(4px);
+                user-select: none;
+                pointer-events: none;
+            }
+
+            .blur-login-overlay {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                padding: 40px 20px;
+                margin: -20px 0 30px;
+                background: linear-gradient(to bottom, rgba(30, 30, 30, 0), rgba(30, 30, 30, 0.95) 30%);
+                border-radius: 16px;
+                text-align: center;
+            }
+
+            .blur-cta {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 6px;
+            }
+
+            .blur-icon {
+                font-size: 2.5rem;
+                margin-bottom: 6px;
+            }
+
+            .blur-cta h3 {
+                font-size: 1.2rem;
+                color: #fff;
+                margin: 0;
+            }
+
+            .blur-cta p {
+                font-size: 0.9rem;
+                color: #888;
+                margin: 0;
             }
             
             .comments-header {
