@@ -49,13 +49,13 @@ function HotPostsList({ session }: { session: any }) {
     }
   };
 
-  // 비로그인 시에도 뒤에 깔린 느낌을 주기 위해 4개 렌더링
-  const visibleLimit = session ? 5 : 4;
+  // 비로그인 시에도 5개를 렌더링하여 자연스러운 페이드 아웃 연출
+  const visibleLimit = 5;
   const displayedPosts = posts.slice(0, visibleLimit);
 
   return (
     <div style={{ position: 'relative' }}>
-      <ul className="post-list" style={!session ? { paddingBottom: '80px', maskImage: 'linear-gradient(to bottom, black 60%, transparent 100%)', WebkitMaskImage: 'linear-gradient(to bottom, black 60%, transparent 100%)' } : {}}>
+      <ul className="post-list" style={!session ? { paddingBottom: '0px', maskImage: 'linear-gradient(to bottom, black 50%, transparent 98%)', WebkitMaskImage: 'linear-gradient(to bottom, black 50%, transparent 98%)' } : {}}>
         {displayedPosts.length > 0 ? displayedPosts.map((post) => (
           <Link
             key={post.id}

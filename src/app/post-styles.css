@@ -180,7 +180,7 @@
     justify-content: flex-end;
     padding-bottom: 24px;
     /* Ensure text readability against background */
-    background: linear-gradient(to top, #000 30%, transparent 100%);
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.9) 10%, transparent 100%);
     z-index: 10;
     border-radius: 0 0 16px 16px;
     pointer-events: none;
