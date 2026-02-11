@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function Navbar() {
     const { data: session, status } = useSession();
@@ -10,6 +10,18 @@ export default function Navbar() {
 
     const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
     const closeMenu = () => setIsMenuOpen(false);
+
+    // 🔧 Sera's Fix #3: Auto-close mobile menu when resizing to desktop
+    useEffect(() => {
+        const handleResize = () => {
+            if (window.innerWidth > 768 && isMenuOpen) {
+                closeMenu();
+            }
+        };
+
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, [isMenuOpen]);
 
     return (
         <nav className="navbar fixed top-0 w-full glass-effect z-50 border-b border-[#333]">
@@ -69,23 +81,24 @@ export default function Navbar() {
             background: rgba(18, 18, 18, 0.95);
             backdrop-filter: blur(12px);
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            height: 60px; /* Reduced height */
+            height: 60px;
             display: flex;
             align-items: center;
         }
 
         .navbar-container {
             width: 100%;
-            max-width: 1200px; /* Limit max width for large screens */
+            max-width: 1200px;
             margin: 0 auto;
             padding: 0 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            height: 100%;
         }
 
         .logo {
-            font-size: 1.25rem; /* Slightly smaller logo */
+            font-size: 1.25rem;
             font-weight: 800;
             color: var(--primary);
             text-decoration: none;
@@ -132,66 +145,106 @@ export default function Navbar() {
             background: rgba(255, 255, 255, 0.1);
         }
 
-        /* Mobile Menu */
+        /* Mobile Menu Button */
         .mobile-menu-btn {
-            display: none; /* Hidden by default on desktop */
+            display: none;
             background: none;
             border: none;
             color: #fff;
-            font-size: 1.5rem;
+            font-size: 1.8rem;
             cursor: pointer;
-            padding: 4px;
+            padding: 8px;
+            line-height: 1;
+            transition: transform 0.2s;
+        }
+        .mobile-menu-btn:active {
+            transform: scale(0.95);
         }
 
+        /* 🎨 Sera's Fix #2: Remove gap in mobile menu */
         .mobile-menu-dropdown {
             position: absolute;
-            top: 60px;
+            top: 56px;
             left: 0;
+            right: 0;
             width: 100%;
-            background: #1a1a1a;
-            border-bottom: 1px solid #333;
+            background: rgba(18, 18, 18, 0.98);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             flex-direction: column;
-            padding: 10px 0;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
-            display: none; /* Controlled by React state logic, but CSS class needed for structure */
-            display: flex; /* Overridden by conditional rendering in JSX, this is just for style block correctness if always rendered */
-            animation: slideDown 0.3s ease-out;
+            padding: 0;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+            display: flex;
+            animation: slideDown 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 40;
         }
 
         @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
+            from { 
+                opacity: 0; 
+                transform: translateY(-8px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0); 
+            }
         }
 
         .mobile-link {
-            padding: 14px 24px;
+            padding: 18px 24px;
             color: #ccc;
             text-decoration: none;
             font-size: 1rem;
-            border-bottom: 1px solid #2a2a2a;
+            font-weight: 500;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
             display: block;
-            text-align: center;
+            text-align: left;
+            transition: all 0.2s;
         }
-        .mobile-link:last-child { border-bottom: none; }
-        .mobile-link:hover { background: #2a2a2a; color: #fff; }
-        .mobile-link.highlight { color: var(--primary); }
-        .mobile-link.gold { color: #FFD700; }
-        .mobile-link.logout { color: #ff6b6b; width: 100%; text-align: center; background: none; border: none; cursor: pointer; }
+        .mobile-link:last-child { 
+            border-bottom: none; 
+        }
+        .mobile-link:hover { 
+            background: rgba(255, 255, 255, 0.05); 
+            color: #fff; 
+            padding-left: 28px;
+        }
+        .mobile-link.highlight { 
+            color: var(--primary); 
+            font-weight: 600;
+        }
+        .mobile-link.gold { 
+            color: #FFD700; 
+            font-weight: 600;
+        }
+        .mobile-link.logout { 
+            color: #ff6b6b; 
+            width: 100%; 
+            text-align: left; 
+            background: none; 
+            border: none; 
+            cursor: pointer; 
+            font-weight: 600;
+        }
 
-        /* Responsive Breakpoints */
+        /* 📱 Responsive - Sera's Fix #1: Better mobile alignment */
         @media (max-width: 768px) {
             .navbar {
-                height: 56px; /* Even smaller for mobile */
-                padding: 0;
+                height: 56px;
             }
             .navbar-container {
                 padding: 0 16px;
             }
+            .logo {
+                font-size: 1.1rem;
+            }
             .desktop-menu {
-                display: none; /* Hide desktop menu on mobile */
+                display: none;
             }
             .mobile-menu-btn {
-                display: block; /* Show hamburger on mobile */
+                display: flex;
+                align-items: center;
+                justify-content: center;
             }
         }
       `}</style>
