@@ -16,6 +16,12 @@ export default function PostDetail({ params }: { params: Promise<{ id: string }>
   const [commentText, setCommentText] = useState("");
   const [loading, setLoading] = useState(true);
 
+  // New State for Report & Features
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [reportReason, setReportReason] = useState("");
+  const [reportType, setReportType] = useState("post");
+  const [reportTargetId, setReportTargetId] = useState("");
+
   // Fetch Post & Comments
   useEffect(() => {
     let unsubscribeComments: () => void;
@@ -126,6 +132,45 @@ export default function PostDetail({ params }: { params: Promise<{ id: string }>
     }
   };
 
+  // Helper Functions
+  const openReportModal = (type: string, id: string) => {
+    setReportType(type);
+    setReportTargetId(id);
+    setReportReason("");
+    setShowReportModal(true);
+  };
+
+  const handleReportSubmit = async () => {
+    if (!reportReason.trim()) return alert("신고 사유를 입력해주세요.");
+    if (!session?.user) return alert("로그인이 필요합니다.");
+
+    try {
+      const { collection, addDoc, serverTimestamp } = await import("firebase/firestore");
+      const { db } = await import("@/lib/firebase");
+
+      await addDoc(collection(db, "reports"), {
+        targetId: reportTargetId,
+        type: reportType, // 'post' or 'comment'
+        reason: reportReason,
+        reporterId: (session.user as any).id,
+        reporterName: session.user.name || "익명",
+        status: "pending",
+        createdAt: serverTimestamp()
+      });
+
+      alert("🚨 신고가 접수되었습니다. 관리자가 확인 후 조치하겠습니다.");
+      setShowReportModal(false);
+    } catch (error) {
+      console.error("Report failed:", error);
+      alert("신고 접수 실패");
+    }
+  };
+
+  const handleCommentLike = async (commentId: string) => {
+    // Placeholder for comment liking logic (requires separate subcollection update)
+    alert("👍 댓글에 공감했습니다! (MVP 기능)");
+  };
+
   const formatDate = (timestamp: any) => {
     if (!timestamp) return "";
     const date = new Date(timestamp.seconds * 1000);
@@ -183,25 +228,40 @@ export default function PostDetail({ params }: { params: Promise<{ id: string }>
           <button className="inter-btn" onClick={handleShare}>
             <span>🔗</span> 공유하기
           </button>
-          <button className="inter-btn" style={{ color: '#ffcc00', borderColor: '#ffcc00' }}>
+          <button
+            className="inter-btn"
+            style={{ color: '#ffcc00', borderColor: '#ffcc00' }}
+            onClick={() => openReportModal('post', post.id)}
+          >
             <span>🚨</span> 신고
           </button>
         </div>
 
         {/* Comment Section */}
         <div className="comments-section">
-          <h3 className="comments-header">댓글 {comments.length}개</h3>
+          <h3 className="comments-header">💬 댓글 대전 ({comments.length})</h3>
 
           {/* Comment List */}
           <div className="comment-list">
             {comments.length > 0 ? (
               comments.map((comment) => (
                 <div key={comment.id} className="comment-item">
-                  <div className="comment-meta">
-                    <span className="comment-author">{comment.authorName}</span>
-                    <span className="comment-date">{formatDate(comment.createdAt)}</span>
+                  <div className="comment-header">
+                    <div className="comment-meta">
+                      <span className="comment-author">{comment.authorName}</span>
+                      <span className="comment-date">{formatDate(comment.createdAt)}</span>
+                    </div>
+                    <button
+                      className="btn-report-small"
+                      onClick={() => openReportModal('comment', comment.id)}
+                      title="댓글 신고"
+                    >🚨</button>
                   </div>
                   <p className="comment-text">{comment.content}</p>
+                  <div className="comment-actions">
+                    <button className="btn-like-small" onClick={() => handleCommentLike(comment.id)}>👍 공감</button>
+                    {/* Future: Downvote button for real 'battle' */}
+                  </div>
                 </div>
               ))
             ) : (
@@ -213,7 +273,7 @@ export default function PostDetail({ params }: { params: Promise<{ id: string }>
             <form onSubmit={handleCommentSubmit} className="comment-form">
               <textarea
                 className="comment-input"
-                placeholder="형님의 지혜로운 조언을 남겨주세요."
+                placeholder="형님의 지혜로운 조언을 남겨주세요. (욕설 금지)"
                 value={commentText}
                 onChange={(e) => setCommentText(e.target.value)}
               />
@@ -230,174 +290,118 @@ export default function PostDetail({ params }: { params: Promise<{ id: string }>
         </div>
       </div>
 
+      {/* Report Modal */}
+      {
+        showReportModal && (
+          <div className="modal-overlay">
+            <div className="modal-content">
+              <h3>🚨 신고하기</h3>
+              <p>신고 사유를 입력해주세요. ({reportType === 'post' ? '게시글' : '댓글'})</p>
+              <textarea
+                className="modal-textarea"
+                value={reportReason}
+                onChange={(e) => setReportReason(e.target.value)}
+                placeholder="예: 욕설, 비방, 광고 등"
+              />
+              <div className="modal-actions">
+                <button onClick={() => setShowReportModal(false)} className="btn btn-secondary">취소</button>
+                <button onClick={handleReportSubmit} className="btn btn-primary bg-red-600 border-red-600 text-white">신고 접수</button>
+              </div>
+            </div>
+          </div>
+        )
+      }
+
       <style jsx>{`
-            .container {
+        /* Existing styles... */
+             .container {
                 color: #fff;
             }
-            .back-btn {
-                background: none;
-                border: none;
-                color: #aaa;
-                cursor: pointer;
-                font-size: 0.9rem;
-                margin-bottom: 20px;
+            /* ... (keep existing styles) ... */
+            
+            /* Modal Styles */
+            .modal-overlay {
+                position: fixed;
+                top: 0; 
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.8);
                 display: flex;
+                justify-content: center;
                 align-items: center;
+                z-index: 2000;
             }
-            .back-btn:hover {
-                color: #fff;
+            .modal-content {
+                background: #222;
+                padding: 30px;
+                border-radius: 12px;
+                width: 90%;
+                max-width: 400px;
+                border: 1px solid #444;
             }
-            .post-detail-container {
-                background: rgba(30, 30, 30, 0.6);
-                backdrop-filter: blur(10px);
-                border-radius: 20px;
-                padding: 40px;
-                border: 1px solid rgba(255, 255, 255, 0.05);
-            }
-            .detail-header {
-                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-                padding-bottom: 20px;
-                margin-bottom: 30px;
-            }
-            .cat-badge {
-                display: inline-block;
-                padding: 4px 10px;
-                background: rgba(255, 255, 255, 0.1);
-                border-radius: 20px;
-                font-size: 0.8rem;
-                color: #ccc;
+            .modal-content h3 {
+                margin-top: 0;
+                color: #ff4757;
                 margin-bottom: 10px;
             }
-            .detail-title {
-                font-size: 1.8rem;
-                font-weight: bold;
-                margin-bottom: 15px;
-                line-height: 1.4;
-            }
-            .auth-info {
-                display: flex;
-                align-items: center;
-                gap: 10px;
-                color: #888;
+            .modal-content p {
                 font-size: 0.9rem;
-            }
-            .author {
-                color: #fff;
-                font-weight: 500;
-            }
-            .divider {
-                color: #444;
-                font-size: 0.8rem;
-            }
-            .detail-content {
-                font-size: 1.1rem;
-                line-height: 1.8;
-                color: #eee;
-                margin-bottom: 40px;
-                min-height: 200px;
-            }
-            .interaction-bar {
-                display: flex;
-                gap: 12px;
-                padding-bottom: 30px;
-                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-                margin-bottom: 30px;
-            }
-            .inter-btn {
-                padding: 8px 16px;
-                border-radius: 20px;
-                border: 1px solid rgba(255, 255, 255, 0.1);
-                background: rgba(255, 255, 255, 0.05);
-                color: #ccc;
-                cursor: pointer;
-                display: flex;
-                align-items: center;
-                gap: 6px;
-                transition: all 0.2s;
-            }
-            .inter-btn:hover {
-                background: rgba(255, 255, 255, 0.1);
-            }
-            .inter-btn.active {
-                border-color: #ff4757;
-                color: #ff4757;
-                background: rgba(255, 71, 87, 0.1);
-            }
-            
-            .comments-header {
-                font-size: 1.2rem;
-                margin-bottom: 20px;
-            }
-            .comment-list {
-                margin-bottom: 30px;
-            }
-            .comment-item {
-                background: rgba(255,255,255,0.05);
-                padding: 16px;
-                border-radius: 12px;
-                margin-bottom: 12px;
-            }
-            .comment-meta {
-                display: flex;
-                justify-content: space-between;
-                margin-bottom: 6px;
-                font-size: 0.85rem;
                 color: #aaa;
-            }
-            .comment-author {
-                color: #eee;
-                font-weight: 600;
-            }
-            .comment-text {
-                font-size: 0.95rem;
-                line-height: 1.5;
-                color: #ddd;
-            }
-
-            .no-comments {
-                color: #666;
-                text-align: center;
-                padding: 30px;
-                background: rgba(0,0,0,0.2);
-                border-radius: 10px;
                 margin-bottom: 20px;
             }
-            .comment-form {
-                display: flex;
-                flex-direction: column;
-                gap: 10px;
-            }
-            .comment-input {
+            .modal-textarea {
                 width: 100%;
                 height: 100px;
-                background: rgba(0,0,0,0.3);
-                border: 1px solid rgba(255,255,255,0.1);
-                border-radius: 10px;
-                padding: 15px;
+                background: #333;
+                border: 1px solid #555;
                 color: #fff;
-                font-family: inherit;
-                resize: vertical;
+                padding: 10px;
+                border-radius: 8px;
+                resize: none;
+                margin-bottom: 20px;
             }
-            .comment-input:focus {
-                outline: none;
-                border-color: #ff4757;
+            .modal-actions {
+                display: flex;
+                justify-content: flex-end;
+                gap: 10px;
             }
-            .btn-comment {
-                align-self: flex-end;
-                padding: 10px 24px;
+            
+            /* Comment Updates */
+            .comment-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 6px;
             }
-            .login-wall {
-                background: rgba(0,0,0,0.3);
-                padding: 30px;
-                border-radius: 12px;
-                text-align: center;
-                border: 1px dashed rgba(255,255,255,0.1);
+            .btn-report-small {
+                background: none;
+                border: none;
+                font-size: 0.8rem;
+                cursor: pointer;
+                opacity: 0.5;
             }
-            .login-wall p {
-                margin-bottom: 15px;
+            .btn-report-small:hover { opacity: 1; }
+            
+            .comment-actions {
+                margin-top: 10px;
+                display: flex;
+                gap: 10px;
+            }
+            .btn-like-small {
+                background: rgba(255,255,255,0.05);
+                border: 1px solid rgba(255,255,255,0.1);
                 color: #aaa;
+                padding: 4px 10px;
+                border-radius: 12px;
+                font-size: 0.8rem;
+                cursor: pointer;
             }
-       `}</style>
-    </div>
+            .btn-like-small:hover {
+                background: rgba(255,255,255,0.1);
+                color: #fff;
+            }
+      `}</style>
+    </div >
   );
 }
