@@ -231,6 +231,28 @@ export default function PostDetail({ params }: { params: Promise<{ id: string }>
     alert("👍 댓글에 공감했습니다! (MVP 기능)");
   };
 
+  const handleCommentDelete = async (commentId: string) => {
+    if (!confirm("댓글을 삭제하시겠습니까?")) return;
+
+    try {
+      const { doc, deleteDoc, updateDoc, increment } = await import("firebase/firestore");
+      const { db } = await import("@/lib/firebase");
+      const postId = unwrappedParams.id;
+
+      // Delete comment
+      await deleteDoc(doc(db, "posts", postId, "comments", commentId));
+
+      // Decrement comment count
+      const postRef = doc(db, "posts", postId);
+      await updateDoc(postRef, { commentCount: increment(-1) });
+
+      alert("댓글이 삭제되었습니다.");
+    } catch (error) {
+      console.error("Error deleting comment:", error);
+      alert("댓글 삭제 실패");
+    }
+  };
+
   const handleDelete = async () => {
     if (!confirm("정말 이 글을 삭제하시겠습니까?\n삭제된 글은 복구할 수 없습니다.")) return;
 
@@ -385,7 +407,15 @@ export default function PostDetail({ params }: { params: Promise<{ id: string }>
                   <p className="comment-text">{comment.content}</p>
                   <div className="comment-actions">
                     <button className="btn-like-small" onClick={() => handleCommentLike(comment.id)}>👍 공감</button>
-                    {/* Future: Downvote button for real 'battle' */}
+                    {session?.user && (session.user as any).id === comment.authorId && (
+                      <button
+                        className="btn-delete-small"
+                        onClick={() => handleCommentDelete(comment.id)}
+                        style={{ color: '#ff4757', marginLeft: 'auto' }}
+                      >
+                        🗑️ 삭제
+                      </button>
+                    )}
                   </div>
                 </div>
               ))

@@ -395,11 +395,31 @@ export default function UserManagement() {
             font-weight: 600;
             transition: all 0.2s;
             }
-            .btn-unban:hover {
-                background: #00c853;
-            color: #fff;
-            box-shadow: 0 4px 10px rgba(0, 200, 83, 0.2);
-            border-color: transparent;
+            @media (max-width: 768px) {
+                .page-header {
+                    flex-direction: column;
+                    align-items: flex-start;
+                    gap: 12px;
+                }
+                .title {
+                    font-size: 1.3rem; /* Reduce font size */
+                }
+                .stats-summary {
+                    gap: 12px;
+                }
+                .stat-box {
+                    padding: 16px 20px;
+                    min-width: 130px;
+                }
+                .value {
+                    font-size: 1.8rem;
+                }
+                .table-container {
+                    border-radius: 12px;
+                }
+                .loading, .no-data {
+                    padding: 40px;
+                }
             }
         `}</style>
         </div >
