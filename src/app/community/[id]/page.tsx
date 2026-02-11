@@ -267,7 +267,7 @@ export default function PostDetail({ params }: { params: Promise<{ id: string }>
 
   return (
     <div className="container" style={{ paddingTop: "100px", paddingBottom: "60px", maxWidth: "800px" }}>
-      <button onClick={() => router.back()} className="back-btn">
+      <button onClick={() => router.push('/community')} className="back-btn">
         <span style={{ marginRight: "8px" }}>↩</span> 목록으로 돌아가기
       </button>
 
@@ -465,7 +465,9 @@ export default function PostDetail({ params }: { params: Promise<{ id: string }>
             .auth-info {
                 display: flex;
                 align-items: center;
+                flex-wrap: wrap; /* Allow wrapping */
                 gap: 10px;
+                row-gap: 4px; /* Space between rows */
                 color: #888;
                 font-size: 0.9rem;
             }
@@ -739,6 +741,19 @@ export default function PostDetail({ params }: { params: Promise<{ id: string }>
             .btn-like-small:hover {
                 background: rgba(255,255,255,0.1);
                 color: #fff;
+            }
+
+            @media (max-width: 480px) {
+                .detail-title {
+                    font-size: 1.4rem;
+                }
+                .auth-info {
+                    font-size: 0.8rem;
+                    gap: 6px;
+                }
+                .post-detail-container {
+                    padding: 20px;
+                }
             }
       `}</style>
     </div >
