@@ -8,19 +8,50 @@ import { useMockStore, Post } from "@/hooks/useMockStore";
 
 function CommunityContent() {
   const { data: session } = useSession();
-  const { posts } = useMockStore();
   const searchParams = useSearchParams();
   const router = useRouter();
 
   // Get initial tab from URL or default to 'all'
   const initialTab = searchParams.get("category") || "all";
   const [activeTab, setActiveTab] = useState(initialTab);
+  const [posts, setPosts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
   // Sync state with URL when params change (e.g. back button)
   useEffect(() => {
     const category = searchParams.get("category") || "all";
     setActiveTab(category);
   }, [searchParams]);
+
+  // Fetch Posts from Firestore
+  useEffect(() => {
+    const fetchPosts = async () => {
+      setLoading(true);
+      try {
+        // Dynamic imports for performance/client-side safety
+        const { collection, query, orderBy, getDocs } = await import("firebase/firestore");
+        const { db } = await import("@/lib/firebase");
+
+        // Fetch all posts ordered by date (desc)
+        // Filtering client-side to avoid "Index Required" errors for now
+        const q = query(collection(db, "posts"), orderBy("createdAt", "desc"));
+        const querySnapshot = await getDocs(q);
+
+        const loadedPosts: any[] = [];
+        querySnapshot.forEach((doc) => {
+          loadedPosts.push({ id: doc.id, ...doc.data() });
+        });
+
+        setPosts(loadedPosts);
+      } catch (error) {
+        console.error("Error fetching posts:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPosts();
+  }, []);
 
   const handleTabChange = (tab: string) => {
     setActiveTab(tab);
@@ -48,6 +79,12 @@ function CommunityContent() {
       case 'secret': return '비밀';
       default: return '자유';
     }
+  };
+
+  const formatDate = (timestamp: any) => {
+    if (!timestamp) return "";
+    const date = new Date(timestamp.seconds * 1000);
+    return date.toLocaleDateString() + " " + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
 
   return (
@@ -94,24 +131,25 @@ function CommunityContent() {
       </div>
 
       <div className="post-list-wrapper">
-        {filteredPosts.length > 0 ? (
+        {loading ? (
+          <div className="empty-state">
+            <p>데이터를 불러오는 중입니다...</p>
+          </div>
+        ) : filteredPosts.length > 0 ? (
           <ul className="post-list">
             {filteredPosts.map((post) => (
               <li key={post.id} className="post-item">
                 <span className={`post-badge ${getBadgeType(post.category)}`}>
                   {getKoreanCategory(post.category)}
                 </span>
-                {/* Pass current category in URL so detail page knows where to go back to? 
-                    Actually, router.back() works better if history stack is correct.
-                    But user asked for it specifically. Let's rely on router.push updating history.
-                 */}
+
                 <Link href={session ? `/community/${post.id}` : "/login"} className="post-link">
                   <span className="post-title">{post.title}</span>
                 </Link>
                 <div className="post-info">
-                  <span className="author">{post.author}</span>
+                  <span className="author">{post.authorName || "익명"}</span>
                   <span className="meta">
-                    👀 {post.views} · 💬 {post.comments} · {post.createdAt}
+                    👀 {post.views || 0} · 💬 {post.commentCount || 0} · {formatDate(post.createdAt)}
                   </span>
                 </div>
               </li>

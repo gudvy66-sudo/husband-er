@@ -9,30 +9,82 @@ export default function PostDetail({ params }: { params: Promise<{ id: string }>
   const unwrappedParams = use(params);
   const router = useRouter();
   const { data: session } = useSession();
-  const { posts, isLoaded } = useMockStore();
 
-  const [post, setPost] = useState<Post | null>(null);
+  const [post, setPost] = useState<any | null>(null);
+  const [comments, setComments] = useState<any[]>([]);
   const [likes, setLikes] = useState(0);
-  const [isLiked, setIsLiked] = useState(false);
   const [commentText, setCommentText] = useState("");
+  const [loading, setLoading] = useState(true);
 
+  // Fetch Post & Comments
   useEffect(() => {
-    if (isLoaded) {
-      const foundPost = posts.find(p => p.id === Number(unwrappedParams.id));
-      if (foundPost) {
-        setPost(foundPost);
-        setLikes(foundPost.likes || 0);
-      }
-    }
-  }, [isLoaded, posts, unwrappedParams.id]);
+    let unsubscribeComments: () => void;
 
-  const handleLike = () => {
-    if (isLiked) {
-      setLikes(prev => prev - 1);
-      setIsLiked(false);
-    } else {
+    const fetchPostData = async () => {
+      try {
+        const { doc, getDoc, collection, query, orderBy, onSnapshot, updateDoc, increment } = await import("firebase/firestore");
+        const { db } = await import("@/lib/firebase");
+
+        const postId = unwrappedParams.id;
+        const postRef = doc(db, "posts", postId);
+        const postSnap = await getDoc(postRef);
+
+        if (postSnap.exists()) {
+          const postData = postSnap.data();
+          setPost({ id: postSnap.id, ...postData });
+          setLikes(postData.likes || 0);
+
+          // Increment views
+          // Use a key in sessionStorage to prevent double counting on strict mode/hot reload
+          const viewedKey = `viewed_${postId}`;
+          if (!sessionStorage.getItem(viewedKey)) {
+            await updateDoc(postRef, { views: increment(1) });
+            sessionStorage.setItem(viewedKey, 'true');
+          }
+
+          // Real-time comments listener
+          const commentsRef = collection(db, "posts", postId, "comments");
+          const q = query(commentsRef, orderBy("createdAt", "asc"));
+
+          unsubscribeComments = onSnapshot(q, (snapshot) => {
+            const commentsData: any[] = [];
+            snapshot.forEach((doc) => {
+              commentsData.push({ id: doc.id, ...doc.data() });
+            });
+            setComments(commentsData);
+          });
+
+        } else {
+          setPost(null);
+        }
+      } catch (error) {
+        console.error("Error loading post:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPostData();
+
+    return () => {
+      if (unsubscribeComments) unsubscribeComments();
+    };
+  }, [unwrappedParams.id]);
+
+  const handleLike = async () => {
+    if (!post) return;
+    // Simple local toggle + DB update (Not preventing multiple likes per user deeply for MVP)
+    // Actually, let's just increment for now as per instruction "Implement handleLike to increment 'likes'"
+
+    try {
+      const { doc, updateDoc, increment } = await import("firebase/firestore");
+      const { db } = await import("@/lib/firebase");
+      const postRef = doc(db, "posts", unwrappedParams.id);
+
+      await updateDoc(postRef, { likes: increment(1) });
       setLikes(prev => prev + 1);
-      setIsLiked(true);
+    } catch (e) {
+      console.error("Like failed", e);
     }
   };
 
@@ -41,15 +93,46 @@ export default function PostDetail({ params }: { params: Promise<{ id: string }>
     alert("🔗 주소가 복사되었습니다! (친구에게 구조 요청 보내세요)");
   };
 
-  const handleCommentSubmit = (e: React.FormEvent) => {
+  const handleCommentSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!commentText.trim()) return;
-    alert("댓글이 등록되었습니다! (Mock)");
-    setCommentText("");
-    // In a real app, we would update the store here
+    if (!session?.user) {
+      alert("로그인이 필요합니다.");
+      return;
+    }
+
+    try {
+      const { collection, addDoc, serverTimestamp, doc, updateDoc, increment } = await import("firebase/firestore");
+      const { db } = await import("@/lib/firebase");
+      const postId = unwrappedParams.id;
+
+      // Add comment
+      await addDoc(collection(db, "posts", postId, "comments"), {
+        content: commentText,
+        authorId: (session.user as any).id,
+        authorName: session.user.name || "익명",
+        createdAt: serverTimestamp()
+      });
+
+      // Update post comment count
+      const postRef = doc(db, "posts", postId);
+      await updateDoc(postRef, { commentCount: increment(1) });
+
+      setCommentText("");
+      // alert("댓글이 등록되었습니다!"); // Real-time update makes alert annoying, skipping
+    } catch (error) {
+      console.error("Comment submit error:", error);
+      alert("댓글 등록 실패");
+    }
   };
 
-  if (!isLoaded) return <div className="container" style={{ paddingTop: "100px", textAlign: "center", color: '#fff' }}>로딩 중...</div>;
+  const formatDate = (timestamp: any) => {
+    if (!timestamp) return "";
+    const date = new Date(timestamp.seconds * 1000);
+    return date.toLocaleDateString() + " " + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  };
+
+  if (loading) return <div className="container" style={{ paddingTop: "100px", textAlign: "center", color: '#fff' }}>로딩 중...</div>;
 
   if (!post) {
     return (
@@ -74,28 +157,28 @@ export default function PostDetail({ params }: { params: Promise<{ id: string }>
           <span className="cat-badge">{post.category}</span>
           <h1 className="detail-title">{post.title}</h1>
           <div className="auth-info">
-            <span className="author">By {post.author}</span>
+            <span className="author">By {post.authorName || "익명"}</span>
             <span className="divider">|</span>
-            <span>조회 {post.views}</span>
+            <span>조회 {post.views || 0}</span>
             <span className="divider">|</span>
-            <span>댓글 {post.comments}</span>
+            <span>댓글 {comments.length}</span>
             <span className="divider">|</span>
-            <span>{post.createdAt}</span>
+            <span>{formatDate(post.createdAt)}</span>
           </div>
         </div>
 
         <div className="detail-content">
-          {post.content.split('\n').map((line, i) => (
+          {post.content?.split('\n').map((line: string, i: number) => (
             <p key={i} style={{ minHeight: line ? 'auto' : '1.2em' }}>{line}</p>
           ))}
         </div>
 
         <div className="interaction-bar">
           <button
-            className={`inter-btn ${isLiked ? 'active' : ''}`}
+            className="inter-btn"
             onClick={handleLike}
           >
-            <span>{isLiked ? '❤️' : '🤍'}</span> 좋아요 {likes}
+            <span>❤️</span> 좋아요 {likes}
           </button>
           <button className="inter-btn" onClick={handleShare}>
             <span>🔗</span> 공유하기
@@ -107,11 +190,23 @@ export default function PostDetail({ params }: { params: Promise<{ id: string }>
 
         {/* Comment Section */}
         <div className="comments-section">
-          <h3 className="comments-header">댓글 {post.comments}개</h3>
+          <h3 className="comments-header">댓글 {comments.length}개</h3>
 
-          {/* Comment List (Mock for now, as useMockStore doesn't store comments array deeply) */}
+          {/* Comment List */}
           <div className="comment-list">
-            <p className="no-comments">아직 작성된 댓글이 없습니다.</p>
+            {comments.length > 0 ? (
+              comments.map((comment) => (
+                <div key={comment.id} className="comment-item">
+                  <div className="comment-meta">
+                    <span className="comment-author">{comment.authorName}</span>
+                    <span className="comment-date">{formatDate(comment.createdAt)}</span>
+                  </div>
+                  <p className="comment-text">{comment.content}</p>
+                </div>
+              ))
+            ) : (
+              <p className="no-comments">아직 작성된 댓글이 없습니다. 첫 번째 조언을 남겨주세요!</p>
+            )}
           </div>
 
           {session ? (
@@ -233,6 +328,32 @@ export default function PostDetail({ params }: { params: Promise<{ id: string }>
                 font-size: 1.2rem;
                 margin-bottom: 20px;
             }
+            .comment-list {
+                margin-bottom: 30px;
+            }
+            .comment-item {
+                background: rgba(255,255,255,0.05);
+                padding: 16px;
+                border-radius: 12px;
+                margin-bottom: 12px;
+            }
+            .comment-meta {
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 6px;
+                font-size: 0.85rem;
+                color: #aaa;
+            }
+            .comment-author {
+                color: #eee;
+                font-weight: 600;
+            }
+            .comment-text {
+                font-size: 0.95rem;
+                line-height: 1.5;
+                color: #ddd;
+            }
+
             .no-comments {
                 color: #666;
                 text-align: center;

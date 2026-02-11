@@ -3,15 +3,15 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { useMockStore } from "@/hooks/useMockStore";
+
 
 export default function WritePage() {
     const router = useRouter();
     const { data: session, status } = useSession();
-    const { addPost } = useMockStore();
 
     const [title, setTitle] = useState("");
     const [content, setContent] = useState("");
+    // Default category 'free'
     const [category, setCategory] = useState("free");
     const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -24,14 +24,14 @@ export default function WritePage() {
     }, [status, router]);
 
     if (status === "loading") {
-        return <div className="write-container"><p style={{ textAlign: "center" }}>확인 중...</p></div>;
+        return <div className="container" style={{ marginTop: "100px", textAlign: "center" }}>Loading...</div>;
     }
 
     if (!session) {
         return null;
     }
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
         if (!title.trim() || !content.trim()) {
@@ -42,20 +42,40 @@ export default function WritePage() {
         setIsSubmitting(true);
 
         try {
-            addPost({
+            // Dynamic import to avoid SSR issues with Firebase if any (though usually fine in useEffect/handlers)
+            // But let's import at top level for cleaner code as this is a "use client" file.
+            // Wait, to be safe and consistent with previous patterns, we can use dynamic or top level.
+            // Let's use top level imports since we are in "use client" and it's standard Next.js 13+ practice.
+            // However, the tool replacement will replace the whole file content or block.
+            // I need to make sure imports are present. 
+            // The constraint is I am replacing the function body. I should add imports at the top using a separate block or include them here?
+            // "Rewrite the WritePage component" implies I can change the whole file or large chunks.
+            // Efficient way: Replace the whole file content to ensure imports are correct.
+
+            // Actually, I'll use the 'replace_file_content' on the whole file or large range.
+            // Let's replace the whole file content to be safe and clean.
+
+            const { collection, addDoc, serverTimestamp } = await import("firebase/firestore");
+            const { db } = await import("@/lib/firebase");
+
+            await addDoc(collection(db, "posts"), {
                 title,
                 content,
                 category,
-                author: session?.user?.name || "익명",
+                authorId: (session.user as any).id, // Ensure id is available in session
+                authorName: session.user?.name || "익명",
+                views: 0,
+                likes: 0,
+                commentCount: 0,
+                createdAt: serverTimestamp(),
             });
 
-            setTimeout(() => {
-                alert("✅ 구조 요청이 접수되었습니다! \n베테랑 유부남들이 곧 달려올 것입니다.");
-                router.push("/community");
-            }, 500);
+            alert("✅ 구조 요청이 접수되었습니다! \n베테랑 유부남들이 곧 달려올 것입니다.");
+            router.push("/community");
+
         } catch (error) {
-            console.error(error);
-            alert("오류가 발생했습니다.");
+            console.error("Error adding document: ", error);
+            alert("오류가 발생했습니다. 다시 시도해주세요.");
             setIsSubmitting(false);
         }
     };
