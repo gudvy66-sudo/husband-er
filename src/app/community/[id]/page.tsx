@@ -507,13 +507,14 @@ export default function PostDetail({ params }: { params: Promise<{ id: string }>
             .interaction-bar {
                 display: flex;
                 flex-wrap: wrap; /* Allow buttons to wrap */
-                gap: 12px;
+                gap: 8px;
                 padding-bottom: 30px;
                 border-bottom: 1px solid rgba(255, 255, 255, 0.1);
                 margin-bottom: 30px;
+                align-items: center;
             }
             .inter-btn {
-                padding: 8px 16px;
+                padding: 8px 14px;
                 border-radius: 20px;
                 border: 1px solid rgba(255, 255, 255, 0.1);
                 background: rgba(255, 255, 255, 0.05);
@@ -523,15 +524,26 @@ export default function PostDetail({ params }: { params: Promise<{ id: string }>
                 align-items: center;
                 gap: 6px;
                 transition: all 0.2s;
+                font-size: 0.9rem;
             }
             .inter-btn:hover {
                 background: rgba(255, 255, 255, 0.1);
+                transform: translateY(-1px);
             }
             .inter-btn.active {
                 border-color: #ff4757;
                 color: #ff4757;
                 background: rgba(255, 71, 87, 0.15);
                 font-weight: 600;
+            }
+
+            @media (max-width: 480px) {
+                .inter-btn {
+                    flex: 1 1 auto; /* Grow to fill space */
+                    justify-content: center;
+                    font-size: 0.85rem;
+                    padding: 8px 10px;
+                }
             }
 
             /* Toast Notification */

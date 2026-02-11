@@ -139,20 +139,21 @@ function CommunityContent() {
           <>
             <ul className="post-list">
               {(session ? filteredPosts : filteredPosts.slice(0, 3)).map((post) => (
-                <li key={post.id} className="post-item">
-                  <span className={`post-badge ${getBadgeType(post.category)}`}>
-                    {getKoreanCategory(post.category)}
-                  </span>
-
-                  <Link href={session ? `/community/${post.id}` : "/login"} className="post-link">
-                    <span className="post-title">{post.title}</span>
-                  </Link>
-                  <div className="post-info">
-                    <span className="author">{post.authorName || "익명"}</span>
-                    <span className="meta">
-                      👀 {post.views || 0} · 💬 {post.commentCount || 0} · {formatDate(post.createdAt)}
+                <li key={post.id} className="post-li">
+                  <Link href={session ? `/community/${post.id}` : "/login"} className="post-item-link">
+                    <span className={`post-badge ${getBadgeType(post.category)}`}>
+                      {getKoreanCategory(post.category)}
                     </span>
-                  </div>
+
+                    <span className="post-title">{post.title}</span>
+
+                    <div className="post-info">
+                      <span className="author">{post.authorName || "익명"}</span>
+                      <span className="meta">
+                        👀 {post.views || 0} · 💬 {post.commentCount || 0} · {formatDate(post.createdAt)}
+                      </span>
+                    </div>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -241,15 +242,25 @@ function CommunityContent() {
             padding: 0;
             margin: 0;
         }
-        .post-item {
+        .post-li {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .post-li:last-child {
+            border-bottom: none;
+        }
+        .post-item-link {
             display: flex;
             align-items: center;
             padding: 16px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            text-decoration: none;
+            color: inherit;
+            width: 100%;
+            transition: background 0.2s;
         }
-        .post-item:last-child {
-            border-bottom: none;
+        .post-item-link:hover {
+            background: rgba(255, 255, 255, 0.02);
         }
+
         .post-badge {
             font-size: 0.75rem;
             padding: 4px 8px;
@@ -258,6 +269,7 @@ function CommunityContent() {
             margin-right: 12px;
             min-width: 50px;
             text-align: center;
+            flex-shrink: 0;
         }
         .post-badge.emergency { background: rgba(255, 71, 87, 0.2); color: #FF4757; }
         .post-badge.warning { background: rgba(255, 165, 2, 0.2); color: #FFA502; }
@@ -265,18 +277,14 @@ function CommunityContent() {
         .post-badge.best { background: rgba(55, 66, 250, 0.2); color: #3742FA; }
         .post-badge.secret { background: rgba(164, 176, 190, 0.2); color: #A4B0BE; }
 
-        .post-link {
+        .post-title {
             flex: 1;
-            text-decoration: none;
             color: #eee;
             margin-right: 10px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-        }
-        .post-title:hover {
-            text-decoration: underline;
-            color: white;
+            font-weight: 500;
         }
         
         .post-info {
@@ -286,6 +294,7 @@ function CommunityContent() {
             font-size: 0.8rem;
             color: #888;
             min-width: 120px;
+            flex-shrink: 0;
         }
         .author {
             color: #aaa;
@@ -297,6 +306,7 @@ function CommunityContent() {
             color: #666;
         }
 
+        /* ... existing login wall styles ... */
         .community-login-wall {
             padding: 40px 20px;
             background: linear-gradient(to bottom, rgba(30, 30, 30, 0), rgba(30, 30, 30, 0.98) 30%);
@@ -328,10 +338,10 @@ function CommunityContent() {
             .page-title {
                 font-size: 1.3rem;
             }
-            .post-item {
+            .post-item-link {
                 flex-wrap: wrap;
             }
-            .post-link {
+            .post-title {
                 min-width: 0; /* Enable truncation inside flex item */
             }
             .post-info {
