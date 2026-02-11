@@ -245,40 +245,44 @@ export default function UserManagement() {
 
             .table-container {
                 background: #fff;
-            border-radius: 16px;
-            box-shadow: 0 4px 24px rgba(0,0,0,0.04);
-            overflow: hidden;
-            border: 1px solid rgba(0,0,0,0.02);
+                border-radius: 16px;
+                box-shadow: 0 4px 24px rgba(0,0,0,0.04);
+                overflow-x: auto; /* Enable horizontal scroll */
+                border: 1px solid rgba(0,0,0,0.02);
+                -webkit-overflow-scrolling: touch;
             }
             .loading, .no-data {
                 padding: 60px;
-            text-align: center;
-            color: #adb5bd;
-            font-size: 1.1rem;
+                text-align: center;
+                color: #adb5bd;
+                font-size: 1.1rem;
             }
 
             .user-table {
                 width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
-            font-size: 0.95rem;
+                border-collapse: separate;
+                border-spacing: 0;
+                font-size: 0.95rem;
+                min-width: 800px; /* Ensure table keeps width */
             }
             .user-table th {
                 background: #f6f9fc;
-            padding: 18px 24px;
-            text-align: left;
-            font-weight: 700;
-            color: #8898aa;
-            text-transform: uppercase;
-            font-size: 0.8rem;
-            letter-spacing: 0.5px;
-            border-bottom: 1px solid #e9ecef;
+                padding: 18px 24px;
+                text-align: left;
+                font-weight: 700;
+                color: #8898aa;
+                text-transform: uppercase;
+                font-size: 0.8rem;
+                letter-spacing: 0.5px;
+                border-bottom: 1px solid #e9ecef;
+                white-space: nowrap; /* Prevent wrapping */
             }
             .user-table td {
                 padding: 20px 24px;
-            border-bottom: 1px solid #f6f9fc;
-            vertical-align: middle;
-            color: #525f7f;
+                border-bottom: 1px solid #f6f9fc;
+                vertical-align: middle;
+                color: #525f7f;
+                white-space: nowrap; /* Prevent wrapping */
             }
             .user-table tr:hover td {background: #f8f9fe; }
             .row-banned td {background: #fff5f5 !important; opacity: 0.7; }

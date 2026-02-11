@@ -299,6 +299,11 @@ function CommunityContent() {
         .author {
             color: #aaa;
             margin-bottom: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100px; /* Limit author width on mobile */
+            text-align: right;
         }
         .empty-state {
             padding: 40px;

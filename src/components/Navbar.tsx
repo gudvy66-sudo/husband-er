@@ -232,7 +232,7 @@ export default function Navbar() {
             font-weight: 500;
             border-bottom: 1px solid rgba(255, 255, 255, 0.05);
             display: block;
-            text-align: left;
+            text-align: center; /* Center align for better mobile look */
             transition: all 0.2s;
         }
         .mobile-link:last-child { 
@@ -241,7 +241,7 @@ export default function Navbar() {
         .mobile-link:hover { 
             background: rgba(255, 255, 255, 0.05); 
             color: #fff; 
-            padding-left: 28px;
+            transform: scale(1.02); /* Subtle scale instead of padding shift */
         }
         .mobile-link.highlight { 
             color: var(--primary); 
@@ -254,7 +254,7 @@ export default function Navbar() {
         .mobile-link.logout { 
             color: #ff6b6b; 
             width: 100%; 
-            text-align: left; 
+            text-align: center; /* Center logout button too */
             background: none; 
             border: none; 
             cursor: pointer; 
