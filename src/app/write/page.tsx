@@ -3,13 +3,16 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
-import "./write.css";
+import { useMockStore } from "@/hooks/useMockStore";
 
 export default function WritePage() {
     const router = useRouter();
     const { data: session, status } = useSession();
+    const { addPost } = useMockStore();
+
     const [title, setTitle] = useState("");
     const [content, setContent] = useState("");
+    const [category, setCategory] = useState("free");
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     // Redirect if not authenticated
@@ -32,62 +35,134 @@ export default function WritePage() {
         e.preventDefault();
 
         if (!title.trim() || !content.trim()) {
-            alert("제목과 내용을 모두 입력해주세요. (절박함이 느껴져야 합니다.)");
+            alert("제목과 내용을 모두 입력해주세요.");
             return;
         }
 
         setIsSubmitting(true);
 
-        // Simulate API call
-        setTimeout(() => {
-            alert("✅ 구조 요청이 접수되었습니다! \n베테랑 유부남들이 곧 달려올 것입니다.");
-            router.push("/community");
-        }, 1200);
+        try {
+            addPost({
+                title,
+                content,
+                category,
+                author: session?.user?.name || "익명",
+            });
+
+            setTimeout(() => {
+                alert("✅ 구조 요청이 접수되었습니다! \n베테랑 유부남들이 곧 달려올 것입니다.");
+                router.push("/community");
+            }, 500);
+        } catch (error) {
+            console.error(error);
+            alert("오류가 발생했습니다.");
+            setIsSubmitting(false);
+        }
     };
 
     return (
-        <div className="write-container">
-            <h1 className="write-title">🚑 긴급 구조 요청서</h1>
+        <main className="container flex-col" style={{ marginTop: "100px" }}>
+            <h1 className="page-title">🚑 긴급 구조 요청서</h1>
 
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit} className="write-form">
                 <div className="form-group">
-                    <label className="label" htmlFor="title">
-                        사태 개요 (Title)
-                    </label>
+                    <label className="label" htmlFor="category">유형 선택</label>
+                    <select
+                        className="input-field"
+                        id="category"
+                        value={category}
+                        onChange={(e) => setCategory(e.target.value)}
+                    >
+                        <option value="free">자유게시판 (잡담/후기)</option>
+                        <option value="question">질문/답변 (조언구함)</option>
+                        <option value="urgent">🚨 긴급상황 (SOS)</option>
+                        <option value="secret">🔒 비밀보장 (익명/19금)</option>
+                    </select>
+                </div>
+
+                <div className="form-group">
+                    <label className="label" htmlFor="title">제목</label>
                     <input
                         className="input-field"
                         type="text"
                         id="title"
-                        placeholder="예: 와이프가 300만 원짜리 명품백을 샀는데..."
+                        placeholder="예: 와이프가 명품백을 샀는데..."
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
                         required
                     />
-                    <p className="help-text">최대한 자극적이고 급박하게 적어야 구조대가 빨리 옵니다.</p>
                 </div>
 
                 <div className="form-group">
-                    <label className="label" htmlFor="content">
-                        피해 상황 보고 (Content)
-                    </label>
+                    <label className="label" htmlFor="content">상세 내용</label>
                     <textarea
                         className="textarea-field"
                         id="content"
-                        placeholder="육하원칙에 의거하여 현재의 위기 상황을 상세히 기술하십시오. (비방, 욕설 금지)"
+                        placeholder="상황을 상세히 기술해주십시오."
                         value={content}
                         onChange={(e) => setContent(e.target.value)}
                         required
-                    ></textarea>
+                    />
                 </div>
 
-                <button
-                    type="submit"
-                    className="submit-btn"
-                    disabled={isSubmitting}
-                >
-                    {isSubmitting ? "전송 중... 📡" : "🆘 즉시 전송 (구조 요청)"}
-                </button>
+                <div className="btn-group">
+                    <button type="button" className="btn btn-secondary" onClick={() => router.back()}>
+                        취소
+                    </button>
+                    <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
+                        {isSubmitting ? "전송 중..." : "등록하기"}
+                    </button>
+                </div>
             </form>
-        </div>
+
+            <style jsx>{`
+                .write-form {
+                    width: 100%;
+                    max-width: 600px;
+                    background: rgba(30, 30, 30, 0.6);
+                    backdrop-filter: blur(10px);
+                    padding: 30px;
+                    border-radius: 16px;
+                    border: 1px solid rgba(255, 255, 255, 0.1);
+                }
+                .form-group {
+                    margin-bottom: 20px;
+                }
+                .label {
+                    display: block;
+                    margin-bottom: 8px;
+                    font-weight: bold;
+                    color: #ddd;
+                }
+                .input-field, .textarea-field {
+                    width: 100%;
+                    padding: 12px;
+                    background: rgba(255, 255, 255, 0.05);
+                    border: 1px solid rgba(255, 255, 255, 0.1);
+                    border-radius: 8px;
+                    color: white;
+                    font-size: 1rem;
+                }
+                .input-field option {
+                    background: #222;
+                    color: white;
+                }
+                .textarea-field {
+                    height: 200px;
+                    resize: vertical;
+                }
+                .btn-group {
+                    display: flex;
+                    gap: 10px;
+                    justify-content: flex-end;
+                    margin-top: 20px;
+                }
+                .page-title {
+                    font-size: 2rem;
+                    margin-bottom: 30px;
+                    text-align: center;
+                }
+            `}</style>
+        </main>
     );
 }

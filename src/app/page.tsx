@@ -2,8 +2,11 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { useSession } from "next-auth/react";
 
 export default function Home() {
+  const { data: session } = useSession();
+
   return (
     <>
       <main className="container flex-col">
@@ -23,9 +26,16 @@ export default function Home() {
           </p>
 
           <div className="btn-group">
-            <Link href="/login" className="btn btn-primary">
-              🚑 지금 바로 입원하기 (회원가입)
-            </Link>
+            {session ? (
+              <Link href="/community" className="btn btn-primary">
+                📋 게시판 입장하기
+              </Link>
+            ) : (
+              <Link href="/login" className="btn btn-primary">
+                🚑 지금 바로 입원하기 (회원가입)
+              </Link>
+            )}
+
             <Link href="/community" className="btn btn-secondary">
               👀 응급실 현황 보기
             </Link>
@@ -39,22 +49,30 @@ export default function Home() {
             <ul className="post-list">
               <li className="post-item">
                 <span className="post-badge emergency">긴급</span>
-                <span className="post-title">와이프가 300만 원짜리 명품백 샀는데 저도 플스5 사도 될까요? (급)</span>
+                <Link href={session ? "/community/1" : "/login"} className="post-link">
+                  <span className="post-title">와이프가 300만 원짜리 명품백 샀는데 저도 플스5 사도 될까요? (급)</span>
+                </Link>
                 <span className="post-meta">댓글 52 · 조회 1.2k</span>
               </li>
               <li className="post-item">
                 <span className="post-badge warning">조언</span>
-                <span className="post-title">비상금 들켰습니다... 베란다 타일 밑이었는데... 하...</span>
+                <Link href={session ? "/community/2" : "/login"} className="post-link">
+                  <span className="post-title">비상금 들켰습니다... 베란다 타일 밑이었는데... 하...</span>
+                </Link>
                 <span className="post-meta">댓글 89 · 조회 3.4k</span>
               </li>
               <li className="post-item">
                 <span className="post-badge best">BEST</span>
-                <span className="post-title">[후기] 로봇청소기인 척 하고 하루 종일 누워있었던 썰 푼다</span>
+                <Link href={session ? "/community/3" : "/login"} className="post-link">
+                  <span className="post-title">[후기] 로봇청소기인 척 하고 하루 종일 누워있었던 썰 푼다</span>
+                </Link>
                 <span className="post-meta">댓글 120 · 조회 5.1k</span>
               </li>
               <li className="post-item">
                 <span className="post-badge normal">질문</span>
-                <span className="post-title">장모님 오신다는데 '회사 비상 호출' 핑계 앱 추천 좀요</span>
+                <Link href={session ? "/community/4" : "/login"} className="post-link">
+                  <span className="post-title">장모님 오신다는데 '회사 비상 호출' 핑계 앱 추천 좀요</span>
+                </Link>
                 <span className="post-meta">댓글 34 · 조회 890</span>
               </li>
               <li className="post-item blur-item">
@@ -63,12 +81,14 @@ export default function Home() {
                 <span className="post-meta">🔒 잠김</span>
               </li>
             </ul>
-            <div className="blur-overlay">
-              <p>더 많은 생존 꿀팁을 보려면?</p>
-              <Link href="/login" className="btn btn-primary btn-sm">
-                3초 만에 가입하고 전체보기
-              </Link>
-            </div>
+            {!session && (
+              <div className="blur-overlay">
+                <p>더 많은 생존 꿀팁을 보려면?</p>
+                <Link href="/login" className="btn btn-primary btn-sm">
+                  3초 만에 가입하고 전체보기
+                </Link>
+              </div>
+            )}
           </div>
         </section>
 

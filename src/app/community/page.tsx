@@ -1,155 +1,218 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
+import { useState } from "react";
+import { useMockStore, Post } from "@/hooks/useMockStore";
 
-const MOCK_POSTS = [
-    {
-        id: 1,
-        title: "와이프가 300만 원짜리 명품백 샀는데 저도 플스5 사도 될까요? (급)",
-        content: "형님들, 지금 백화점입니다. 와이프가 카드 긁는 순간 제 머릿속에 '플스5 프로'가 스쳐 지나갔습니다. 이거 공평한 거 아닙니까? 지금 지르면 등짝 스매싱일까요, 아니면 합리적 소비일까요? 투표 좀 부탁드립니다.",
-        author: "플스마려운놈",
-        date: "10분 전",
-        views: 1240,
-        likes: 56,
-        comments: [
-            { user: "생존왕", text: "절대 안 됩니다. '나도 샀으니 너도 사'는 통하지 않습니다. 와이프 꺼는 '필수품'이고 님 꺼는 '장난감' 취급 당합니다." },
-            { user: "이미죽은자", text: "그냥 사세요. 허락보다 용서가 쉽습니다." }
-        ]
-    },
-    {
-        id: 2,
-        title: "비상금 들켰습니다... 베란다 타일 밑이었는데... 하...",
-        content: "아니 거기를 어떻게 안 거죠? 청소하다가 발견했다는데 말이 됩니까? 3년 동안 모은 450만 원... 저녁에 압수수색 들어온다는데 어디로 튀어야 합니까? 급합니다.",
-        author: "타일공",
-        date: "30분 전",
-        views: 3402,
-        likes: 128,
-        comments: [
-            { user: "독심술사", text: "일단 무릎 꿇고 '서프라이즈 여행 가려고 모은 거야'라고 우기세요. 안 통하겠지만..." }
-        ]
-    },
-    {
-        id: 3,
-        title: "[19금 생존 비법] 주말에 아내를 잠재우는 마사지 스킬 (후방주의)",
-        content: "이 글은 회원 등급 '중급 생존자' 이상만 열람 가능합니다. (로그인이 필요합니다)",
-        isLocked: true,
-        author: "마사지신",
-        date: "1시간 전",
-        views: 5100,
-        likes: 450,
-        comments: []
-    },
-    {
-        id: 4,
-        title: "장모님 오신다는데 '야근' 핑계 댈 수 있는 앱 추천 좀...",
-        content: "이번 주말입니다. 도와주십시오. 회사에서 긴급 호출 온 것처럼 알람 울리게 하는 앱 없습니까?",
-        author: "사위1호",
-        date: "2시간 전",
-        views: 890,
-        likes: 34,
-        comments: []
+export default function Community() {
+  const { data: session } = useSession();
+  const { posts } = useMockStore();
+  const [activeTab, setActiveTab] = useState("all");
+
+  const filteredPosts = activeTab === "all"
+    ? posts
+    : posts.filter(post => post.category === activeTab);
+
+  const getBadgeType = (category: string) => {
+    switch (category) {
+      case 'urgent': return 'emergency';
+      case 'question': return 'normal';
+      case 'secret': return 'secret';
+      default: return 'warning';
     }
-];
+  };
 
-export default function CommunityList() {
-    const [filter, setFilter] = useState("all");
+  const getKoreanCategory = (category: string) => {
+    switch (category) {
+      case 'urgent': return '긴급';
+      case 'question': return '질문';
+      case 'secret': return '비밀';
+      default: return '자유';
+    }
+  };
 
-    return (
-        <div className="container" style={{ paddingTop: "100px", paddingBottom: "60px" }}>
-            <div className="community-header">
-                <h1 style={{ fontSize: "2rem", fontWeight: "800", marginBottom: "10px" }}>📋 응급실 대기 현황</h1>
-                <p style={{ color: "#aaa" }}>
-                    현재 {MOCK_POSTS.length}명의 유부남이 구조를 기다리고 있습니다.
-                </p>
-                <Link href="/write" className="btn btn-primary" style={{ marginTop: "20px", display: "inline-block" }}>
-                    🖊️ 구조 요청 (글쓰기)
+  return (
+    <main className="container flex-col" style={{ marginTop: "80px", maxWidth: "800px" }}>
+      <div className="community-header">
+        <h1 className="page-title">📋 응급실 현황 (게시판)</h1>
+        <Link href={session ? "/write" : "/login"} className="btn btn-primary btn-sm">
+          ✍️ 구조 요청 (글쓰기)
+        </Link>
+      </div>
+
+      {/* Category Tabs */}
+      <div className="tabs">
+        <button
+          className={`tab ${activeTab === "all" ? "active" : ""}`}
+          onClick={() => setActiveTab("all")}
+        >
+          전체
+        </button>
+        <button
+          className={`tab ${activeTab === "urgent" ? "active" : ""}`}
+          onClick={() => setActiveTab("urgent")}
+        >
+          🚨 긴급
+        </button>
+        <button
+          className={`tab ${activeTab === "free" ? "active" : ""}`}
+          onClick={() => setActiveTab("free")}
+        >
+          🗣️ 자유
+        </button>
+        <button
+          className={`tab ${activeTab === "question" ? "active" : ""}`}
+          onClick={() => setActiveTab("question")}
+        >
+          ❓ 질문
+        </button>
+        <button
+          className={`tab ${activeTab === "secret" ? "active" : ""}`}
+          onClick={() => setActiveTab("secret")}
+        >
+          🔒 비밀
+        </button>
+      </div>
+
+      <div className="post-list-wrapper">
+        {filteredPosts.length > 0 ? (
+          <ul className="post-list">
+            {filteredPosts.map((post) => (
+              <li key={post.id} className="post-item">
+                <span className={`post-badge ${getBadgeType(post.category)}`}>
+                  {getKoreanCategory(post.category)}
+                </span>
+                <Link href={session ? `/community/${post.id}` : "/login"} className="post-link">
+                  <span className="post-title">{post.title}</span>
                 </Link>
-            </div>
+                <div className="post-info">
+                  <span className="author">{post.author}</span>
+                  <span className="meta">
+                    👀 {post.views} · 💬 {post.comments} · {post.createdAt}
+                  </span>
+                </div>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <div className="empty-state">
+            <p>📭 아직 등록된 글이 없습니다. 첫 번째 구조 요청을 보내보세요!</p>
+          </div>
+        )}
+      </div>
 
-            <div className="post-list-card">
-                {MOCK_POSTS.map((post) => (
-                    <div key={post.id} className={`post-item ${post.isLocked ? 'locked' : ''}`}>
-                        <div className="post-content">
-                            <Link href={post.isLocked ? "/login" : `/community/${post.id}`} className="post-link">
-                                <h3 className="post-title">
-                                    {post.isLocked && <span className="lock-icon">🔒 </span>}
-                                    {post.title}
-                                </h3>
-                                <div className="post-meta">
-                                    <span>{post.author}</span> · <span>{post.date}</span> · <span>조회 {post.views}</span>
-                                </div>
-                            </Link>
-                        </div>
-                        <div className="post-actions">
-                            <span className="likes">❤️ {post.likes}</span>
-                            <span className="comments">💬 {post.comments.length}</span>
-                        </div>
-                    </div>
-                ))}
-            </div>
-
-            <style jsx>{`
+      <style jsx>{`
         .community-header {
-          text-align: center;
-          margin-bottom: 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            margin-bottom: 24px;
+        }
+        .page-title {
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin: 0;
+        }
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            padding-bottom: 5px;
+        }
+        .tab {
+            padding: 8px 16px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #aaa;
+            cursor: pointer;
+            font-size: 0.9rem;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+        .tab.active {
+            background: #FF4757;
+            color: white;
+            border-color: #FF4757;
+            font-weight: bold;
+        }
+        .tab:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.1);
         }
 
-        .post-list-card {
-          background: rgba(255, 255, 255, 0.05);
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          border-radius: 16px;
-          overflow: hidden;
+        .post-list-wrapper {
+            width: 100%;
+            background: rgba(30, 30, 30, 0.4);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            min-height: 300px;
         }
-
+        .post-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
         .post-item {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          padding: 20px;
-          border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-          transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            padding: 16px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         }
-
-        .post-item:hover {
-          background: rgba(255, 255, 255, 0.08);
+        .post-item:last-child {
+            border-bottom: none;
         }
-
-        .post-item.locked {
-          opacity: 0.7;
-          background: rgba(0, 0, 0, 0.2);
+        .post-badge {
+            font-size: 0.75rem;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-weight: 700;
+            margin-right: 12px;
+            min-width: 50px;
+            text-align: center;
         }
+        .post-badge.emergency { background: rgba(255, 71, 87, 0.2); color: #FF4757; }
+        .post-badge.warning { background: rgba(255, 165, 2, 0.2); color: #FFA502; }
+        .post-badge.normal { background: rgba(46, 213, 115, 0.2); color: #2ED573; }
+        .post-badge.best { background: rgba(55, 66, 250, 0.2); color: #3742FA; }
+        .post-badge.secret { background: rgba(164, 176, 190, 0.2); color: #A4B0BE; }
 
         .post-link {
-          display: block;
-          width: 100%;
+            flex: 1;
+            text-decoration: none;
+            color: #eee;
+            margin-right: 10px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
-
-        .post-title {
-          font-size: 1.1rem;
-          font-weight: 600;
-          color: #fff;
-          margin-bottom: 8px;
+        .post-title:hover {
+            text-decoration: underline;
+            color: white;
         }
-
-        .lock-icon {
-          margin-right: 5px;
+        
+        .post-info {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            font-size: 0.8rem;
+            color: #888;
+            min-width: 120px;
         }
-
-        .post-meta {
-          font-size: 0.85rem;
-          color: #888;
+        .author {
+            color: #aaa;
+            margin-bottom: 2px;
         }
-
-        .post-actions {
-          display: flex;
-          gap: 12px;
-          color: #aaa;
-          font-size: 0.9rem;
-          min-width: 80px;
-          justify-content: flex-end;
+        .empty-state {
+            padding: 40px;
+            text-align: center;
+            color: #666;
         }
       `}</style>
-        </div>
-    );
+    </main>
+  );
 }

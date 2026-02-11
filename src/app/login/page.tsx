@@ -1,73 +1,70 @@
 "use client";
 
+import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { useState } from "react";
-import { signIn } from "next-auth/react";
 
-export default function LoginPage() {
-  const [isLoading, setIsLoading] = useState(false);
+export default function Login() {
+  const [loading, setLoading] = useState(false);
 
-  const handleMockLogin = async (provider: string) => {
-    setIsLoading(true);
-    // Simulate API delay for UX
-    setTimeout(async () => {
-      // For demo/testing purposes, all login methods work!
+  const handleNaverLogin = async () => {
+    setLoading(true);
+    await signIn("naver", { callbackUrl: "/" });
+  };
+
+  const handleAdminLogin = async () => {
+    // Secret Admin Login for Testing
+    if (confirm("관리자 계정으로 접속하시겠습니까?")) {
       await signIn("credentials", {
-        username: `${provider}_user`,
-        password: `${provider}_user`,
-        callbackUrl: "/exam"
+        username: "admin",
+        password: "admin",
+        callbackUrl: "/"
       });
-    }, 800);
+    }
   };
 
   return (
-    <div className="login-container">
+    <main>
       <div className="login-card">
-        <h1 className="login-title">
-          <span>🚔</span> 신원 확인
-        </h1>
+        <h1 className="login-title">🚨 긴급 입원 수속</h1>
         <p className="login-desc">
-          여기는 유부남 전용 구역입니다. <br />
-          간편 로그인으로 3초 만에 입장하세요.
+          대한민국 유부남들의 마지막 대피소 <br />
+          <span className="highlight">남편응급실</span>에 오신 것을 환영합니다.
         </p>
 
-        <div className="auth-buttons">
-          <button
-            className="btn-auth kakao"
-            onClick={() => handleMockLogin("kakao")}
-            disabled={isLoading}
-          >
-            <span className="icon">💬</span> 카카오로 3초 만에 시작 (테스트)
+        <div className="login-buttons">
+          <button onClick={handleNaverLogin} className="btn-social naver" disabled={loading}>
+            {loading ? "연결 중..." : "N 네이버로 시작하기"}
           </button>
 
+          <div className="division-line"></div>
+
+          {/* Dev Only: Admin Login */}
           <button
-            className="btn-auth naver"
-            onClick={() => handleMockLogin("naver")}
-            disabled={isLoading}
+            onClick={handleAdminLogin}
+            className="btn-admin"
           >
-            <span className="icon">🇳</span> 네이버로 시작하기 (테스트)
+            🕵️ 관리자(테스트) 접속
           </button>
         </div>
-
-        <div className="divider">
-          <span>또는</span>
-        </div>
-
-        <button
-          className="btn-text"
-          onClick={() => handleMockLogin("admin")}
-        >
-          🕵️ 테스트 계정으로 입장 (관리자용)
-        </button>
 
         <p className="login-footer">
-          가입 시 <strong>아내의 접근</strong>으로부터 보호받을 수 있습니다. <br />
-          (물론 책임은 본인에게 있습니다.)
+          아직 회원이 아니신가요? <br />
+          네이버 아이디 하나로 즉시 입원 가능합니다.
         </p>
+
+        <div style={{ marginTop: "20px", fontSize: "0.8rem", color: "#666" }}>
+          <p>⚠️ 아내분이 보고 계신가요?</p>
+          <p>
+            <Link href="https://www.naver.com" style={{ color: "#888", textDecoration: "underline" }}>
+              긴급 탈출 버튼 (네이버 메인으로 이동)
+            </Link>
+          </p>
+        </div>
       </div>
 
       <style jsx>{`
-        .login-container {
+        main {
           min-height: 100vh;
           display: flex;
           align-items: center;
@@ -77,16 +74,16 @@ export default function LoginPage() {
         }
 
         .login-card {
-           background: rgba(25, 25, 25, 0.6);
-           backdrop-filter: blur(20px);
-           border: 1px solid rgba(255, 255, 255, 0.1);
-           padding: 40px;
-           border-radius: 24px;
-           width: 100%;
-           max-width: 400px;
-           text-align: center;
-           box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-           animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+          background: rgba(25, 25, 25, 0.6);
+          backdrop-filter: blur(20px);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          padding: 40px;
+          border-radius: 24px;
+          width: 100%;
+          max-width: 400px;
+          text-align: center;
+          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+          animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         @keyframes slideUp {
@@ -95,105 +92,91 @@ export default function LoginPage() {
         }
 
         .login-title {
-          font-size: 1.8rem;
+          font-size: 2rem;
           font-weight: 800;
-          margin-bottom: 12px;
-          color: #fff;
+          margin-bottom: 8px;
         }
 
-        .login-title span {
-          margin-right: 8px;
-          font-size: 2rem;
+        .highlight {
+          color: #FF4757;
+          text-shadow: 0 0 10px rgba(255, 71, 87, 0.5);
         }
 
         .login-desc {
-          color: #888;
-          font-size: 0.95rem;
+          font-size: 1rem;
+          color: #aaa;
           margin-bottom: 32px;
-          line-height: 1.5;
+          line-height: 1.6;
         }
 
-        .auth-buttons {
+        .login-buttons {
           display: flex;
           flex-direction: column;
           gap: 12px;
         }
 
-        .btn-auth {
+        .btn-social {
+          width: 100%;
+          padding: 14px;
+          border: none;
+          border-radius: 12px;
+          font-size: 1rem;
+          font-weight: 700;
+          cursor: pointer;
+          transition: transform 0.2s, filter 0.2s;
           display: flex;
           align-items: center;
           justify-content: center;
-          width: 100%;
-          padding: 16px;
-          border-radius: 12px;
-          font-weight: 700;
-          font-size: 1rem;
-          border: none;
-          cursor: pointer;
-          transition: transform 0.2s, filter 0.2s;
+          gap: 10px;
+          position: relative;
+          overflow: hidden;
         }
 
-        .btn-auth:hover {
+        .btn-social:hover {
           transform: scale(1.02);
           filter: brightness(1.1);
         }
 
-        .btn-auth:active {
+        .btn-social:active {
           transform: scale(0.98);
         }
 
-        .btn-auth .icon {
-          margin-right: 10px;
-          font-size: 1.2rem;
-        }
-
-        .kakao {
-          background-color: #FEE500;
-          color: #000;
-        }
-
         .naver {
-          background-color: #03C75A;
-          color: #fff;
+          background: #03C75A;
+          color: white;
         }
 
-        .divider {
-          margin: 24px 0;
-          position: relative;
-          color: #444;
-          font-size: 0.8rem;
-        }
-
-        .divider::before, .divider::after {
-          content: "";
-          position: absolute;
-          top: 50%;
-          width: 40%;
+        .division-line {
+          width: 100%;
           height: 1px;
-          background: #333;
+          background: rgba(255, 255, 255, 0.1);
+          margin: 16px 0;
         }
 
-        .divider::before { left: 0; }
-        .divider::after { right: 0; }
-
-        .btn-text {
-          background: none;
-          border: none;
+        .btn-admin {
+          margin-top: 10px;
+          background: transparent;
+          border: 1px dashed #444;
           color: #666;
-          font-size: 0.9rem;
+          padding: 8px;
+          border-radius: 8px;
           cursor: pointer;
-          text-decoration: underline;
+          font-size: 0.8rem;
+          width: 100%;
         }
 
-        .btn-text:hover { color: #fff; }
+        .btn-admin:hover {
+          background: rgba(255, 255, 255, 0.05);
+          color: #888;
+        }
 
         .login-footer {
           margin-top: 32px;
-          font-size: 0.75rem;
-          color: #444;
-          line-height: 1.4;
+          font-size: 0.9rem;
+          color: #666;
+          line-height: 1.5;
         }
       `}</style>
-    </div>
+    </main>
   );
 }

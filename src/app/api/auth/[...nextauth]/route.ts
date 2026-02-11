@@ -1,47 +1,52 @@
+
 import NextAuth from "next-auth";
+import NaverProvider from "next-auth/providers/naver";
 import CredentialsProvider from "next-auth/providers/credentials";
 
 const handler = NextAuth({
     providers: [
-        CredentialsProvider({
-            name: "Mock Login",
-            credentials: {
-                username: { label: "Username", type: "text", placeholder: "admin" },
-                password: { label: "Password", type: "password" },
-            },
-            async authorize(credentials) {
-                // Mock login for demo purposes - accept multiple test accounts
-                const validUsers = ["admin", "kakao_user", "naver_user", "exam_passed_user"];
-
-                if (
-                    credentials?.username &&
-                    credentials?.password &&
-                    validUsers.includes(credentials.username) &&
-                    credentials.username === credentials.password
-                ) {
-                    return {
-                        id: "1",
-                        name: credentials.username === "admin" ? "Admin Husband" :
-                            credentials.username === "kakao_user" ? "카카오 유부남" :
-                                credentials.username === "naver_user" ? "네이버 유부남" :
-                                    "Exam Passed Husband",
-                        email: `${credentials.username}@er.com`
-                    };
-                }
-                return null;
-            },
+        NaverProvider({
+            clientId: process.env.NAVER_CLIENT_ID || "",
+            clientSecret: process.env.NAVER_CLIENT_SECRET || "",
         }),
-        // Future: Add KakaoProvider and NaverProvider here
+        CredentialsProvider({
+            name: "Credentials",
+            credentials: {
+                username: { label: "Username", type: "text", placeholder: "jsmith" },
+                password: { label: "Password", type: "password" }
+            },
+            async authorize(credentials, req) {
+                // Mock user for testing
+                if (credentials?.username === "admin" && credentials?.password === "admin") {
+                    return { id: "1", name: "관리자", email: "admin@example.com", role: "admin" }
+                }
+                return null
+            }
+        })
     ],
     pages: {
         signIn: "/login",
     },
-    secret: process.env.NEXTAUTH_SECRET || "development-secret-key-change-in-production",
-    session: {
-        strategy: "jwt",
-    },
-    theme: {
-        colorScheme: "dark",
+    callbacks: {
+        async jwt({ token, user, account }) {
+            // First login: Add user info to token
+            if (user) {
+                token.id = user.id;
+                token.role = "user"; // Default role
+                token.level = 1; // Default level
+                token.examPassed = false;
+            }
+            return token;
+        },
+        async session({ session, token }) {
+            // Pass token info to session so client can see it
+            if (session.user) {
+                session.user.role = token.role;
+                session.user.level = token.level;
+                session.user.examPassed = token.examPassed;
+            }
+            return session;
+        },
     },
 });
 
