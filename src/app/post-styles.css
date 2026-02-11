@@ -112,11 +112,11 @@
         min-height: 180px;
     }
 
-    .post-item {
+    .hot-posts-wrapper .post-item {
         display: flex !important;
         /* Ensure flex */
         flex-direction: row !important;
-        /* Force row with vengeance */
+        /* Force row with vengeance, defeating mobile.css */
         flex-wrap: nowrap !important;
         /* No wrapping whatsoever */
         align-items: center !important;
@@ -125,7 +125,7 @@
         padding: 10px;
     }
 
-    .post-badge {
+    .hot-posts-wrapper .post-badge {
         flex-shrink: 0 !important;
         /* Badge never shrinks */
         margin-bottom: 0 !important;
@@ -134,7 +134,7 @@
         /* Optional: adjust spacing */
     }
 
-    .post-title {
+    .hot-posts-wrapper .post-title {
         flex: 1 1 auto !important;
         /* Grow and shrink */
         min-width: 0 !important;
@@ -146,7 +146,7 @@
         /* Remove display: block if it interferes, flex item default is fine */
     }
 
-    .post-meta {
+    .hot-posts-wrapper .post-meta {
         display: block !important;
         /* Show meta */
         flex-shrink: 0 !important;
