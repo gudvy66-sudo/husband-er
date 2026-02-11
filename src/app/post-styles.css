@@ -167,14 +167,15 @@
     bottom: 0;
     left: 0;
     width: 100%;
-    height: 80px;
-    /* Shorter overlay */
+    height: 120px;
+    /* Increased height to cover 5th item completely */
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: flex-end;
-    padding-bottom: 16px;
-    background: linear-gradient(to top, rgba(0, 0, 0, 0.95) 10%, transparent 100%);
+    padding-bottom: 20px;
+    background: linear-gradient(to top, #000 40%, transparent 100%);
+    /* Solid black at bottom, stronger obscure */
     z-index: 10;
     border-radius: 0 0 16px 16px;
     pointer-events: none;
