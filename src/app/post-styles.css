@@ -113,53 +113,52 @@
     }
 
     .post-item {
-        display: flex;
+        display: flex !important;
         /* Ensure flex */
-        flex-direction: row;
-        /* Force row */
-        flex-wrap: nowrap;
-        /* No wrapping */
-        align-items: center;
+        flex-direction: row !important;
+        /* Force row with vengeance */
+        flex-wrap: nowrap !important;
+        /* No wrapping whatsoever */
+        align-items: center !important;
         gap: 8px;
         /* Gap between elements */
         padding: 10px;
     }
 
     .post-badge {
-        flex-shrink: 0;
+        flex-shrink: 0 !important;
         /* Badge never shrinks */
-        margin-bottom: 0;
+        margin-bottom: 0 !important;
         /* Reset margins */
         margin-right: 4px;
         /* Optional: adjust spacing */
     }
 
     .post-title {
-        flex: 1 1 auto;
+        flex: 1 1 auto !important;
         /* Grow and shrink */
-        min-width: 0;
+        min-width: 0 !important;
         /* Critical for truncation in flex container */
         font-size: 0.9rem;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
         /* Remove display: block if it interferes, flex item default is fine */
     }
 
     .post-meta {
-        display: block;
-        /* Show meta on mobile */
-        flex-shrink: 0;
-        /* Meta never shrinks */
-        width: auto;
-        /* Auto width */
-        margin-left: 8px;
-        /* Spacing from title, auto margin might push too far */
-        margin-top: 0;
-        text-align: right;
-        font-size: 0.7rem;
+        display: block !important;
+        /* Show meta */
+        flex-shrink: 0 !important;
+        /* Never shrink */
+        width: auto !important;
+        margin-left: auto !important;
+        /* Push to right */
+        margin-top: 0 !important;
+        text-align: right !important;
+        font-size: 0.7rem !important;
         color: #888;
-        white-space: nowrap;
+        white-space: nowrap !important;
     }
 }
 
