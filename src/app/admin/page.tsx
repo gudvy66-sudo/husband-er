@@ -2,49 +2,36 @@
 
 import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
-import { collection, getDocs } from "firebase/firestore";
-import { db } from "@/lib/firebase";
-const kpiData = [
-    { label: "총 회원수", value: "1,248", unit: "명", diff: "+14", color: "blue" },
-    { label: "오늘 접속자", value: "892", unit: "명", diff: "+5.1%", color: "green" },
-    { label: "신규 게시글", value: "54", unit: "건", diff: "+12", color: "purple" },
-    { label: "처리 대기 신고", value: "5", unit: "건", diff: "-1", color: "red" },
-];
+import Link from "next/link";
+// Removed static firebase imports to prevent build errors (SSG location issue)
 
-const reportedPosts = [
-    { id: 1, type: "스팸/광고", title: "[광고] 100% 수익 보장 해외선물", reporter: "익명_12", date: "2024-02-11 14:20", status: "대기중" },
-    { id: 2, type: "욕설/비방", title: "진짜 이혼 마렵네 ㅋㅋㅋ", reporter: "화난남편", date: "2024-02-11 10:05", status: "처리중" },
-    { id: 3, type: "음란물", title: "후방주의) 이거 보셈", reporter: "순찰대원", date: "2024-02-10 23:12", status: "차단됨" },
-];
-
-const recentMembers = [
-    { id: 101, name: "김철수", email: "kim@test.com", joined: "10분 전", role: "User" },
-    { id: 102, name: "박영수", email: "park@test.com", joined: "35분 전", role: "User" },
-    { id: 103, name: "이민호", email: "lee@test.com", joined: "1시간 전", role: "VIP" },
-    { id: 104, name: "최광수", email: "choi@test.com", joined: "2시간 전", role: "User" },
-];
+// Mock data removed. Real data fetched in component.
 
 export default function AdminDashboard() {
+    const { data: session } = useSession();
+    const [reports, setReports] = useState<any[]>([]);
     const [stats, setStats] = useState({
         totalUsers: 0,
         todayVisitors: 0,
         totalPosts: 0,
         pendingReports: 0
     });
-    const [recentMembers, setRecentMembers] = useState<any[]>([]);
+    const [realRecentMembers, setRealRecentMembers] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchDashboardData = async () => {
             try {
-                // 1. Fetch Users Data
+                // Dynamic imports
+                const { collection, getDocs, onSnapshot, query, orderBy, limit } = await import("firebase/firestore");
+                const { db } = await import("@/lib/firebase");
+
+                // 1. Fetch Users Data (One-time fetch for stats)
                 const usersRef = collection(db, "users");
-                const usersSnap = await getDocs(usersRef); // Ideally use getCountFromServer for large DBs
+                const usersSnap = await getDocs(usersRef);
                 const totalUsers = usersSnap.size;
 
-                // Calculate Today Visitors (Mocking strictly 'today' logic via client filter for small DB, 
-                // or use where('lastLogin', '>=', today) if index exists)
-                // Let's use client filter for safety without index
+                // Calculate Today Visitors
                 const todayIndices = new Date();
                 todayIndices.setHours(0, 0, 0, 0);
 
@@ -53,11 +40,9 @@ export default function AdminDashboard() {
 
                 usersSnap.forEach(doc => {
                     const data = doc.data();
-                    // Visitors
                     if (data.lastLogin?.seconds * 1000 >= todayIndices.getTime()) {
                         visitorsCount++;
                     }
-                    // Prepare all members for sorting later (or fetch separately)
                     membersList.push({ id: doc.id, ...data });
                 });
 
@@ -74,23 +59,46 @@ export default function AdminDashboard() {
                         initial: m.name ? m.name[0] : '?'
                     }));
 
-                setRecentMembers(sortedMembers);
+                setRealRecentMembers(sortedMembers);
 
                 // 2. Fetch Posts Data
-                // If posts collection doesn't exist yet, it will return size 0, which is fine.
                 const psnap = await getDocs(collection(db, "posts"));
                 const totalPosts = psnap.size;
+
+                // 3. Real-time Reports Listener
+                const reportsQuery = query(collection(db, "reports"), orderBy("createdAt", "desc"), limit(5));
+
+                // We use a separate listener for reports list, but for stats we might need total count.
+                // For 'pendingReports' count, we can just use the snapshot size of a query for status='pending'.
+                // But to be simple, let's just listen to all reports or a reasonable subset + metadata if possible.
+                // Since this is a dashboard, we'll fetch all reports to count 'pending'.
+
+                const allReportsSnap = await getDocs(collection(db, "reports"));
+                const pendingCount = allReportsSnap.docs.filter(d => d.data().status === 'pending').length;
+
+                // Listen for recent reports for the table
+                const unsubscribe = onSnapshot(reportsQuery, (snapshot) => {
+                    const loadedReports = snapshot.docs.map(doc => ({
+                        id: doc.id,
+                        ...doc.data(),
+                        // Safe date conversion
+                        createdAt: doc.data().createdAt?.toDate ? doc.data().createdAt.toDate() : new Date()
+                    }));
+                    setReports(loadedReports);
+                });
 
                 setStats({
                     totalUsers,
                     todayVisitors: visitorsCount,
                     totalPosts,
-                    pendingReports: 5 // Keep mock for reports
+                    pendingReports: pendingCount
                 });
+
+                setLoading(false);
+                return () => unsubscribe();
 
             } catch (e) {
                 console.error("Dashboard Fetch Error", e);
-            } finally {
                 setLoading(false);
             }
         };
@@ -100,7 +108,7 @@ export default function AdminDashboard() {
         }
     }, [session]);
 
-    const kpiData = [
+    const displayKpiData = [
         { label: "총 회원수", value: stats.totalUsers.toLocaleString(), unit: "명", diff: "+new", color: "blue" },
         { label: "오늘 접속자", value: stats.todayVisitors.toLocaleString(), unit: "명", diff: "Today", color: "green" },
         { label: "총 게시글", value: stats.totalPosts.toLocaleString(), unit: "건", diff: "Accumulated", color: "purple" },
@@ -111,7 +119,7 @@ export default function AdminDashboard() {
         <div className="dashboard-container">
             {/* KPI Cards */}
             <div className="kpi-grid">
-                {kpiData.map((item, idx) => (
+                {displayKpiData.map((item, idx) => (
                     <div key={idx} className={`kpi-card ${item.color}`}>
                         <div className="kpi-label">{item.label}</div>
                         <div className="kpi-value">
@@ -129,17 +137,17 @@ export default function AdminDashboard() {
 
             {/* Main Dashboard Panels */}
             <div className="panel-grid">
-                {/* Reported Posts Table (Mock) */}
+                {/* Reported Posts Table (Real) */}
                 <div className="panel">
                     <div className="panel-header">
-                        <h3>🚨 실시간 신고 접수 (Mock)</h3>
-                        <a href="/admin/reports" className="btn-more">더보기 &gt;</a>
+                        <h3>🚨 실시간 신고 접수</h3>
+                        <Link href="/admin/reports" className="btn-more">더보기 &gt;</Link>
                     </div>
                     <table className="data-table">
                         <thead>
                             <tr>
                                 <th>유형</th>
-                                <th>제목</th>
+                                <th>내용/제목</th>
                                 <th>신고자</th>
                                 <th>일시</th>
                                 <th>상태</th>
@@ -147,21 +155,29 @@ export default function AdminDashboard() {
                             </tr>
                         </thead>
                         <tbody>
-                            {reportedPosts.map((post) => (
-                                <tr key={post.id}>
-                                    <td><span className="badge-type">{post.type}</span></td>
-                                    <td className="col-title">{post.title}</td>
-                                    <td>{post.reporter}</td>
-                                    <td className="col-date">{post.date}</td>
-                                    <td>
-                                        <span className={`status-dot ${post.status === '대기중' ? 'red' : post.status === '처리중' ? 'orange' : 'gray'}`}></span>
-                                        {post.status}
-                                    </td>
-                                    <td>
-                                        <button className="btn-action">확인</button>
-                                    </td>
-                                </tr>
-                            ))}
+                            {loading ? (
+                                <tr><td colSpan={6} style={{ textAlign: 'center', padding: '20px' }}>로딩 중...</td></tr>
+                            ) : reports.length > 0 ? (
+                                reports.map((report) => (
+                                    <tr key={report.id}>
+                                        <td><span className="badge-type">{report.type || '신고'}</span></td>
+                                        <td className="col-title">{report.reason || report.targetId}</td>
+                                        <td>{report.reporterName || '익명'}</td>
+                                        <td className="col-date">
+                                            {report.createdAt.toLocaleString()}
+                                        </td>
+                                        <td>
+                                            <span className={`status-dot ${report.status === 'pending' ? 'red' : 'gray'}`}></span>
+                                            {report.status === 'pending' ? '대기중' : report.status}
+                                        </td>
+                                        <td>
+                                            <button className="btn-action">확인</button>
+                                        </td>
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr><td colSpan={6} style={{ textAlign: 'center', padding: '20px' }}>접수된 신고가 없습니다.</td></tr>
+                            )}
                         </tbody>
                     </table>
                 </div>
@@ -170,12 +186,12 @@ export default function AdminDashboard() {
                 <div className="panel side-panel">
                     <div className="panel-header">
                         <h3>👥 신규 가입 회원</h3>
-                        <a href="/admin/users" className="btn-more">전체보기</a>
+                        <Link href="/admin/users" className="btn-more">전체보기</Link>
                     </div>
                     <ul className="member-list">
                         {loading ? <p style={{ padding: '20px', color: '#888' }}>로딩 중...</p> :
-                            recentMembers.length > 0 ? (
-                                recentMembers.map((member) => (
+                            realRecentMembers.length > 0 ? (
+                                realRecentMembers.map((member) => (
                                     <li key={member.id} className="member-item">
                                         <div className="member-avatar">{member.initial}</div>
                                         <div className="member-info">

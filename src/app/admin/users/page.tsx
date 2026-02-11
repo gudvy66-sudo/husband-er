@@ -1,8 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { collection, getDocs, doc, updateDoc, query, orderBy, Timestamp } from "firebase/firestore";
-import { db } from "@/lib/firebase"; // Ensure this alias works or use relative path if needed
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
@@ -14,8 +12,8 @@ interface UserData {
     gender: string;
     role: string;
     status: string;
-    createdAt: Timestamp;
-    lastLogin: Timestamp;
+    createdAt: any;
+    lastLogin: any;
 }
 
 export default function UserManagement() {
@@ -28,6 +26,9 @@ export default function UserManagement() {
     const fetchUsers = async () => {
         try {
             setLoading(true);
+            const { collection, getDocs, query, orderBy } = await import("firebase/firestore");
+            const { db } = await import("@/lib/firebase");
+
             // Query users ordered by creation time
             // Note: Index might be needed for complex queries, but simple orderBy usually works or throws link to create index
             const q = query(collection(db, "users"), orderBy("createdAt", "desc"));
@@ -57,6 +58,9 @@ export default function UserManagement() {
     const handleRoleUpdate = async (userId: string, newRole: string) => {
         if (!confirm(`해당 회원의 등급을 '${newRole}'(으)로 변경하시겠습니까?`)) return;
         try {
+            const { doc, updateDoc } = await import("firebase/firestore");
+            const { db } = await import("@/lib/firebase");
+
             const userRef = doc(db, "users", userId);
             await updateDoc(userRef, { role: newRole });
             // Optimistic update
@@ -70,6 +74,9 @@ export default function UserManagement() {
         const actionName = newStatus === 'banned' ? '차단' : '활동 재개';
         if (!confirm(`해당 회원을 '${actionName}' 처리하시겠습니까?`)) return;
         try {
+            const { doc, updateDoc } = await import("firebase/firestore");
+            const { db } = await import("@/lib/firebase");
+
             const userRef = doc(db, "users", userId);
             await updateDoc(userRef, { status: newStatus });
             // Optimistic update
@@ -79,7 +86,7 @@ export default function UserManagement() {
         }
     };
 
-    const formatDate = (ts: Timestamp) => {
+    const formatDate = (ts: any) => {
         if (!ts) return "-";
         return new Date(ts.seconds * 1000).toLocaleDateString();
     };

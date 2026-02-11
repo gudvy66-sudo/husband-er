@@ -9,7 +9,7 @@ export default function Navbar() {
     return (
         <nav className="navbar fixed top-0 w-full flex justify-between items-center p-6 glass-effect bg-opacity-80 backdrop-blur-md z-50 border-b border-[#333]">
             <Link href="/" className="logo text-2xl font-bold tracking-tighter text-[var(--primary)] animate-pulse">
-                <span>🚨</span> 남편응급실.
+                <span>🚨</span> 남편응급실
             </Link>
 
             <div style={{ display: "flex", gap: "20px", alignItems: "center" }}>
@@ -18,6 +18,9 @@ export default function Navbar() {
                     <div style={{ width: "100px", height: "30px" }}></div>
                 ) : session ? (
                     <>
+                        <Link href="/" className="nav-link" style={{ color: "var(--text-sub)" }}>
+                            🏠 홈
+                        </Link>
                         <Link href="/community" className="nav-link" style={{ color: "var(--primary)" }}>
                             📋 게시판
                         </Link>

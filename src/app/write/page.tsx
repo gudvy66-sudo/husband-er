@@ -81,7 +81,7 @@ export default function WritePage() {
     };
 
     return (
-        <main className="container flex-col" style={{ marginTop: "100px" }}>
+        <main className="container flex-col" style={{ marginTop: "100px", display: "flex", alignItems: "center" }}>
             <h1 className="page-title">🚑 긴급 구조 요청서</h1>
 
             <form onSubmit={handleSubmit} className="write-form">

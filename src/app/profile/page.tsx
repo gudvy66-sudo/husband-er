@@ -3,16 +3,63 @@
 import { useSession, signOut } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
 
 export default function ProfilePage() {
   const { data: session } = useSession();
   const router = useRouter();
+  const [myPosts, setMyPosts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
   // Redirect if not logged in
   if (!session) {
-    router.push("/login");
-    return null;
+    if (typeof window !== "undefined") router.push("/login");
   }
+
+  useEffect(() => {
+    const fetchMyPosts = async () => {
+      if (!session?.user) return;
+
+      try {
+        const { collection, query, where, getDocs, orderBy } = await import("firebase/firestore");
+        const { db } = await import("@/lib/firebase");
+
+        // The user id in session might be under 'id' or 'sub' or just we use email if id not present
+        // adjusting based on typical NextAuth + Firebase
+        // Assuming session.user has an id or we use email. Let's try to match authorId.
+        // In write page we used: authorId: (session.user as any).id
+        const userId = (session.user as any).id;
+
+        if (!userId) {
+          setLoading(false);
+          return;
+        }
+
+        const q = query(
+          collection(db, "posts"),
+          where("authorId", "==", userId),
+          orderBy("createdAt", "desc")
+        );
+
+        const querySnapshot = await getDocs(q);
+        const posts = querySnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+          createdAt: doc.data().createdAt?.toDate ? doc.data().createdAt.toDate() : new Date()
+        }));
+
+        setMyPosts(posts);
+      } catch (error) {
+        console.error("Error fetching my posts:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (session) {
+      fetchMyPosts();
+    }
+  }, [session]);
 
   // Get user's rank from session (mock for now)
   const userRank = {
@@ -22,6 +69,8 @@ export default function ProfilePage() {
     icon: "🏆",
     color: "#FFD700"
   };
+
+  if (!session) return null;
 
   return (
     <div className="profile-container">
@@ -52,15 +101,15 @@ export default function ProfilePage() {
       {/* Stats */}
       <div className="stats-grid">
         <div className="stat-card">
-          <div className="stat-value">3</div>
+          <div className="stat-value">{myPosts.length}</div>
           <div className="stat-label">작성 글</div>
         </div>
         <div className="stat-card">
-          <div className="stat-value">12</div>
+          <div className="stat-value">0</div>
           <div className="stat-label">댓글</div>
         </div>
         <div className="stat-card">
-          <div className="stat-value">56</div>
+          <div className="stat-value">0</div>
           <div className="stat-label">받은 좋아요</div>
         </div>
       </div>
@@ -69,18 +118,20 @@ export default function ProfilePage() {
       <div className="section">
         <h3 className="section-title">내가 쓴 글</h3>
         <div className="post-list">
-          <Link href="/community/1" className="post-item-small">
-            <span className="post-title-small">와이프가 300만 원짜리 명품백을...</span>
-            <span className="post-date">2일 전</span>
-          </Link>
-          <Link href="/community/2" className="post-item-small">
-            <span className="post-title-small">비상금 들켰습니다...</span>
-            <span className="post-date">5일 전</span>
-          </Link>
-          <Link href="/community/4" className="post-item-small">
-            <span className="post-title-small">장모님 방문 대비책</span>
-            <span className="post-date">1주 전</span>
-          </Link>
+          {loading ? (
+            <div style={{ padding: "20px", textAlign: "center", color: "#888" }}>로딩 중...</div>
+          ) : myPosts.length > 0 ? (
+            myPosts.map((post) => (
+              <Link href={`/community/${post.id}`} key={post.id} className="post-item-small">
+                <span className="post-title-small">{post.title}</span>
+                <span className="post-date">
+                  {new Date(post.createdAt).toLocaleDateString()}
+                </span>
+              </Link>
+            ))
+          ) : (
+            <div style={{ padding: "20px", textAlign: "center", color: "#888" }}>작성한 글이 없습니다.</div>
+          )}
         </div>
       </div>
 

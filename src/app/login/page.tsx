@@ -9,7 +9,7 @@ export default function Login() {
 
   const handleNaverLogin = async () => {
     setLoading(true);
-    await signIn("naver", { callbackUrl: "/" });
+    await signIn("naver", { callbackUrl: "/community" });
   };
 
   const handleAdminLogin = async () => {
@@ -18,7 +18,7 @@ export default function Login() {
       await signIn("credentials", {
         username: "admin",
         password: "admin",
-        callbackUrl: "/"
+        callbackUrl: "/community"
       });
     }
   };

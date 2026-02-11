@@ -12,8 +12,19 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase (Singleton pattern)
-const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
-const db = getFirestore(app);
-const auth = getAuth(app);
+// Initialize Firebase (Singleton pattern)
+let app: any, db: any, auth: any;
+
+try {
+  app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+  db = getFirestore(app);
+  auth = getAuth(app);
+} catch (error) {
+  console.warn("Firebase initialization failed (safe on server if not using firebase features):", error);
+  // Export dummy objects to prevent import crashes, but runtime usage will fail if not handled
+  app = null;
+  db = null;
+  auth = null;
+}
 
 export { app, db, auth };

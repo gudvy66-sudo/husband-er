@@ -1,17 +1,19 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { collection, getDocs, doc, deleteDoc, query, orderBy, Timestamp } from "firebase/firestore";
-import { db } from "@/lib/firebase";
 import { useRouter } from "next/navigation";
+// Removed static firebase imports for SSG safety
 
+// Define Timestamp type locally or import type only?
+// Firestore Timestamp type is complicated. Let's use 'any' for now or import type if possible.
+// Actually, we can just use 'any' for the interface to avoid importing 'Timestamp' class.
 interface PostData {
     id: string;
     title: string;
     category: string;
     authorName: string;
     views: number;
-    createdAt: Timestamp;
+    createdAt: any; // using any to avoid static import of Timestamp
 }
 
 export default function AdminPosts() {
@@ -22,6 +24,9 @@ export default function AdminPosts() {
     const fetchPosts = async () => {
         setLoading(true);
         try {
+            const { collection, getDocs, query, orderBy } = await import("firebase/firestore");
+            const { db } = await import("@/lib/firebase");
+
             const q = query(collection(db, "posts"), orderBy("createdAt", "desc"));
             const querySnapshot = await getDocs(q);
 
@@ -54,6 +59,9 @@ export default function AdminPosts() {
         if (!confirm("🚨 정말로 이 게시글을 삭제하시겠습니까?\n삭제된 데이터는 복구할 수 없습니다.")) return;
 
         try {
+            const { doc, deleteDoc } = await import("firebase/firestore");
+            const { db } = await import("@/lib/firebase");
+
             await deleteDoc(doc(db, "posts", postId));
             alert("게시글이 삭제되었습니다.");
             // Refresh list locally
@@ -64,7 +72,7 @@ export default function AdminPosts() {
         }
     };
 
-    const formatDate = (ts: Timestamp) => {
+    const formatDate = (ts: any) => {
         if (!ts) return "-";
         return new Date(ts.seconds * 1000).toLocaleDateString();
     };
