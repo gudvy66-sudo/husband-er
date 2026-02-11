@@ -146,7 +146,7 @@ export default function Home() {
       </main>
 
       <footer className="footer">
-        <p>© 2024 남편응급실. Designed by Sera & Developed by Kodari.</p>
+        <p>© 2026 남편응급실. Designed by Sera & Developed by Kodari.</p>
       </footer>
     </>
   );
