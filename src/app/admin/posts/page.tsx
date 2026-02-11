@@ -142,102 +142,123 @@ export default function AdminPosts() {
             <style jsx>{`
                 .admin-page-container {
                     padding: 0 4px;
+                    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
                 }
                 .page-header {
                     display: flex;
                     justify-content: space-between;
                     align-items: center;
-                    margin-bottom: 24px;
+                    margin-bottom: 30px;
                 }
                 .title {
-                    font-size: 1.5rem;
-                    font-weight: 700;
-                    color: #333;
+                    font-size: 1.8rem;
+                    font-weight: 800;
+                    color: #2c3e50;
+                    letter-spacing: -0.5px;
                 }
                 .btn-refresh {
-                    padding: 8px 16px;
+                    padding: 10px 20px;
                     background: #fff;
-                    border: 1px solid #ddd;
-                    border-radius: 6px;
+                    border: 1px solid #e0e0e0;
+                    border-radius: 8px;
                     cursor: pointer;
+                    font-weight: 600;
+                    color: #555;
+                    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
                 }
-                .btn-refresh:hover { background: #f5f5f5; }
+                .btn-refresh:hover {
+                    background: #f8f9fa;
+                    transform: translateY(-2px);
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+                }
 
                 .table-container {
                     background: #fff;
-                    border-radius: 12px;
-                    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+                    border-radius: 16px;
+                    box-shadow: 0 4px 24px rgba(0,0,0,0.04);
                     overflow: hidden;
-                    overflow-x: auto;
+                    border: 1px solid rgba(0,0,0,0.02);
                 }
                 .loading, .no-data {
-                    padding: 40px;
+                    padding: 60px;
                     text-align: center;
-                    color: #888;
+                    color: #adb5bd;
+                    font-size: 1.1rem;
                 }
                 
                 .data-table {
                     width: 100%;
-                    border-collapse: collapse;
-                    font-size: 0.9rem;
+                    border-collapse: separate;
+                    border-spacing: 0;
+                    font-size: 0.95rem;
                 }
                 .data-table th {
-                    background: #f8f9fa;
-                    padding: 16px;
+                    background: #f6f9fc;
+                    padding: 18px 24px;
                     text-align: left;
-                    font-weight: 600;
-                    color: #555;
-                    border-bottom: 2px solid #eee;
+                    font-weight: 700;
+                    color: #8898aa;
+                    text-transform: uppercase;
+                    font-size: 0.8rem;
+                    letter-spacing: 0.5px;
+                    border-bottom: 1px solid #e9ecef;
                 }
                 .data-table td {
-                    padding: 16px;
-                    border-bottom: 1px solid #f1f1f1;
+                    padding: 20px 24px;
+                    border-bottom: 1px solid #f6f9fc;
                     vertical-align: middle;
-                    color: #333;
+                    color: #525f7f;
                 }
-                .data-table tr:hover { background: #fcfcfc; }
+                .data-table tr:hover td { background: #f8f9fe; }
 
                 .col-title {
-                    max-width: 300px;
+                    max-width: 320px;
                     overflow: hidden;
                     text-overflow: ellipsis;
                     white-space: nowrap;
                 }
                 .link-title {
                     text-decoration: none;
-                    color: #2c3e50;
-                    font-weight: 500;
+                    color: #32325d;
+                    font-weight: 600;
+                    transition: color 0.2s;
+                    display: block;
                 }
                 .link-title:hover {
+                    color: #5e72e4;
                     text-decoration: underline;
-                    color: #3498db;
                 }
 
                 .badge {
-                    padding: 4px 8px;
-                    border-radius: 4px;
+                    padding: 6px 10px;
+                    border-radius: 8px;
                     font-size: 0.75rem;
-                    font-weight: 600;
-                    background: #eee; 
-                    color: #555;
+                    font-weight: 700;
+                    display: inline-block;
+                    text-transform: uppercase;
                 }
-                .badge.urgent { background: #ffebee; color: #c0392b; }
-                .badge.question { background: #e8f5e9; color: #27ae60; }
-                .badge.secret { background: #eceff1; color: #7f8c8d; }
+                .badge.urgent { background: #fee2e2; color: #f5365c; }
+                .badge.question { background: #e8f5e9; color: #2dce89; }
+                .badge.secret { background: #eceff1; color: #525f7f; }
+                .badge.free { background: #e3f2fd; color: #1171ef; }
 
                 .btn-delete {
-                    padding: 6px 12px;
+                    padding: 8px 16px;
                     background: #fff;
-                    border: 1px solid #ef9a9a;
-                    color: #e53935;
-                    border-radius: 4px;
+                    border: 1px solid #fcebeb;
+                    color: #f5365c;
+                    border-radius: 8px;
                     cursor: pointer;
-                    font-size: 0.8rem;
+                    font-size: 0.85rem;
+                    font-weight: 600;
                     transition: all 0.2s;
                 }
                 .btn-delete:hover {
-                    background: #e53935;
+                    background: #f5365c;
                     color: #fff;
+                    border-color: transparent;
+                    box-shadow: 0 4px 6px rgba(245, 54, 92, 0.2);
                 }
             `}</style>
         </div>

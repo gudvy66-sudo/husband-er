@@ -54,47 +54,99 @@ export default function AdminSettings() {
             </div>
 
             <style jsx>{`
-                .admin-page-container { padding: 0 4px; }
-                .title { font-size: 1.5rem; font-weight: 700; color: #333; margin-bottom: 24px; }
+                .admin-page-container {
+                    padding: 0 4px;
+                    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+                }
+                .page-header {
+                    margin-bottom: 30px;
+                }
+                .title {
+                    font-size: 1.8rem;
+                    font-weight: 800;
+                    color: #2c3e50;
+                    letter-spacing: -0.5px;
+                }
                 
                 .settings-grid {
                     display: grid;
-                    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-                    gap: 24px;
+                    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+                    gap: 30px;
                 }
 
                 .setting-card {
                     background: #fff;
-                    border-radius: 12px;
-                    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-                    padding: 24px;
+                    border-radius: 16px;
+                    box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+                    border: 1px solid rgba(0,0,0,0.02);
+                    padding: 28px;
+                    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+                }
+                .setting-card:hover {
+                    transform: translateY(-4px);
+                    box-shadow: 0 8px 25px rgba(0,0,0,0.05);
                 }
 
                 .setting-card h3 {
-                    font-size: 1.1rem;
-                    font-weight: 600;
-                    color: #333;
-                    margin-bottom: 20px;
-                    border-bottom: 1px solid #eee;
-                    padding-bottom: 10px;
+                    font-size: 1.15rem;
+                    font-weight: 700;
+                    color: #32325d;
+                    margin-bottom: 24px;
+                    border-bottom: 1px solid #f6f9fc;
+                    padding-bottom: 16px;
+                    letter-spacing: -0.5px;
                 }
 
-                .control-group { margin-bottom: 12px; }
-                .desc { font-size: 0.85rem; color: #888; margin-top: 8px; }
+                .control-group { margin-bottom: 20px; }
+                .desc { font-size: 0.85rem; color: #8898aa; margin-top: 8px; line-height: 1.5; }
 
                 .switch-label {
                     display: flex;
                     justify-content: space-between;
                     align-items: center;
                     cursor: pointer;
-                    font-weight: 500;
-                    color: #555;
+                    font-weight: 600;
+                    color: #525f7f;
+                    font-size: 0.95rem;
                 }
 
-                .info-list { display: flex; flex-direction: column; gap: 12px; }
-                .info-item { display: flex; justify-content: space-between; font-size: 0.9rem; }
-                .info-item .label { color: #888; }
-                .info-item .value { font-weight: 600; color: #333; }
+                /* Custom Toggle Switch CSS */
+                .switch-label input { display: none; }
+                .slider {
+                    width: 44px;
+                    height: 24px;
+                    background-color: #e9ecef;
+                    border-radius: 24px;
+                    position: relative;
+                    transition: 0.3s;
+                }
+                .slider::before {
+                    content: "";
+                    position: absolute;
+                    width: 18px;
+                    height: 18px;
+                    border-radius: 50%;
+                    background: #fff;
+                    top: 3px;
+                    left: 3px;
+                    transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+                }
+                input:checked + .slider { background-color: #2dce89; }
+                input:checked + .slider::before { transform: translateX(20px); }
+                input:disabled + .slider { opacity: 0.5; cursor: not-allowed; }
+
+                .info-list { display: flex; flex-direction: column; gap: 16px; }
+                .info-item {
+                    display: flex;
+                    justify-content: space-between;
+                    font-size: 0.9rem;
+                    padding: 8px 0;
+                    border-bottom: 1px dashed #f6f9fc;
+                }
+                .info-item:last-child { border-bottom: none; }
+                .info-item .label { color: #8898aa; font-weight: 500; }
+                .info-item .value { font-weight: 600; color: #32325d; }
             `}</style>
         </div>
     );
