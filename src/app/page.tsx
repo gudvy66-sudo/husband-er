@@ -71,9 +71,9 @@ function HotPostsList({ session }: { session: any }) {
                 </div>
                 {/* 오버레이 (버튼) */}
                 <div className="locked-overlay">
-                  <span className="lock-msg">🔒 궁금하면?</span>
+                  <span className="lock-msg">Secret Content</span>
                   <Link href="/login" className="btn-lock-cta">
-                    3초 가입
+                    3초 만에 확인하기
                   </Link>
                 </div>
               </li>

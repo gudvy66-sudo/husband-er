@@ -166,21 +166,37 @@
     }
 }
 
-/* Locked Item Style (Single Row Blur) */
+/* Locked Item Style (Chic Glassmorphism) */
 .post-item.locked {
     position: relative;
-    cursor: default;
+    cursor: pointer;
     overflow: hidden;
     user-select: none;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    /* Subtle border */
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.post-item.locked:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+    /* Soft shadow on hover */
 }
 
 .locked-blur {
     display: flex;
     align-items: center;
     width: 100%;
-    filter: blur(4px);
-    opacity: 0.6;
+    filter: blur(6px);
+    /* Stronger blur for mystery */
+    opacity: 0.5;
     pointer-events: none;
+    transition: filter 0.3s ease;
+}
+
+.post-item.locked:hover .locked-blur {
+    filter: blur(8px);
+    /* Blur more on hover */
 }
 
 .locked-overlay {
@@ -190,35 +206,58 @@
     width: 100%;
     height: 100%;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    background: rgba(0, 0, 0, 0.4);
+    background: rgba(255, 255, 255, 0.2);
+    /* Light tint */
+    backdrop-filter: blur(2px);
+    /* Glass effect */
     z-index: 5;
-    gap: 12px;
+    padding: 0 20px;
+    /* Padding for button */
 }
 
+/* Full Width Gradient Button */
 .btn-lock-cta {
-    background: var(--primary);
-    color: #000;
+    width: 100%;
+    max-width: 320px;
+    /* Limit max width for desktop */
+    background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%);
+    /* Warm attention color */
+    color: #fff;
     border: none;
-    padding: 6px 14px;
-    border-radius: 6px;
-    font-weight: 800;
-    font-size: 0.85rem;
+    padding: 12px 20px;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 0.95rem;
     cursor: pointer;
     text-decoration: none;
-    box-shadow: 0 0 10px rgba(0, 255, 65, 0.4);
-    transition: transform 0.2s;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
 }
 
 .btn-lock-cta:hover {
-    transform: scale(1.05);
-    box-shadow: 0 0 15px rgba(0, 255, 65, 0.6);
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 8px 25px rgba(255, 107, 107, 0.5);
+}
+
+.btn-lock-cta::before {
+    content: '🔒';
+    font-size: 1.1rem;
 }
 
 .lock-msg {
-    color: #fff;
-    font-weight: 700;
-    font-size: 0.9rem;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    color: #555;
+    font-weight: 600;
+    font-size: 0.85rem;
+    margin-bottom: 8px;
+    opacity: 0.8;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
