@@ -32,7 +32,8 @@ const handler = NextAuth({
             // First login: Add user info to token
             if (user) {
                 token.id = user.id;
-                token.role = "user"; // Default role
+                // Preserve role from authorize function (for admin) or default to "user"
+                token.role = (user as any).role || "user";
                 token.level = 1; // Default level
                 token.examPassed = false;
             }
