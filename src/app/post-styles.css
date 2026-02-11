@@ -18,7 +18,8 @@
     position: relative;
     overflow: hidden;
     width: 100%;
-    max-width: 1200px;
+    max-width: 1280px;
+    /* Expanded width to fix visual alignment */
     /* Align with feature cards grid */
     margin: 0 auto;
     min-height: 180px;
@@ -171,18 +172,21 @@
     bottom: 0;
     left: 0;
     width: 100%;
-    height: 60px;
+    height: 70px;
+    /* Slightly increased to ensure 5th item is well covered */
     /* Reduced to cover only the 5th item */
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: flex-end;
     padding-bottom: 20px;
-    background: linear-gradient(to top, #000 60%, rgba(0, 0, 0, 0.8) 85%, transparent 100%);
+    background: linear-gradient(to top, #000 80%, rgba(0, 0, 0, 0.8) 95%, transparent 100%);
+    /* Stronger blackout higher up */
     /* Strong blackout */
-    backdrop-filter: blur(20px);
+    backdrop-filter: blur(30px);
+    /* Maximum blur */
     /* Heavy blur */
-    -webkit-backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(30px);
     z-index: 20;
     border-radius: 0 0 16px 16px;
     pointer-events: none;
