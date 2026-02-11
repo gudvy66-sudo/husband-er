@@ -454,6 +454,7 @@ export default function PostDetail({ params }: { params: Promise<{ id: string }>
             }
             .interaction-bar {
                 display: flex;
+                flex-wrap: wrap; /* Allow buttons to wrap */
                 gap: 12px;
                 padding-bottom: 30px;
                 border-bottom: 1px solid rgba(255, 255, 255, 0.1);

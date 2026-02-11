@@ -4,6 +4,7 @@
 @import "./mobile.css";
 
 /* Global Reset */
+/* Global Reset */
 :root {
   --bg-color: #0d0d0d;
   --text-main: #f0f0f0;
@@ -103,10 +104,13 @@ a {
 }
 
 .hero-title {
-  font-size: clamp(3rem, 5vw, 5rem);
+  font-size: clamp(2.5rem, 5vw, 5rem);
+  /* Reduced min size from 3rem to 2.5rem */
   font-weight: 900;
   line-height: 1.1;
   margin-bottom: 24px;
+  word-break: keep-all;
+  /* Prevent awkward word breaks */
 }
 
 .highlight {
@@ -120,6 +124,8 @@ a {
   color: var(--text-sub);
   max-width: 600px;
   margin: 0 auto 48px;
+  padding: 0 10px;
+  /* Add padding for very small screens */
 }
 
 /* Button Styles */
@@ -128,6 +134,7 @@ a {
   gap: 16px;
   justify-content: center;
   flex-wrap: wrap;
+  /* Allow wrapping on small screens */
 }
 
 .btn {
@@ -166,7 +173,8 @@ a {
 /* Card Grid */
 .features-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  /* Reduced from 300px to 280px */
   gap: 24px;
   margin-top: 80px;
   padding: 0 20px;
@@ -252,12 +260,19 @@ a {
   color: var(--text-main);
 }
 
+/* Mobile Adjustments */
 @media (max-width: 768px) {
   .navbar {
     height: 56px;
   }
+
   .logo {
     font-size: 1.1rem;
+  }
+
+  .hero-title {
+    font-size: 2rem;
+    /* Force smaller size on mobile */
   }
 }
 

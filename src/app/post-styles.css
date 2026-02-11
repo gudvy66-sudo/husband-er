@@ -130,13 +130,32 @@
 
 @media (max-width: 768px) {
     .post-item {
-        flex-direction: column;
-        align-items: flex-start;
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .post-title {
+        font-size: 0.95rem;
+        /* Slightly smaller on mobile */
+        white-space: normal;
+        /* Allow wrapping */
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        /* Max 2 lines */
+        -webkit-box-orient: vertical;
+        overflow: hidden;
     }
 
     .post-meta {
+        width: 100%;
+        /* Force new line */
         margin-left: 0;
-        margin-top: 4px;
+        margin-top: 2px;
+        text-align: right;
+        font-size: 0.75rem;
+        color: #888;
     }
 
     .hot-posts-wrapper {

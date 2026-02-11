@@ -328,6 +328,19 @@ function CommunityContent() {
             .page-title {
                 font-size: 1.3rem;
             }
+            .post-item {
+                flex-wrap: wrap;
+            }
+            .post-link {
+                min-width: 0; /* Enable truncation inside flex item */
+            }
+            .post-info {
+                width: 100%;
+                flex-direction: row;
+                justify-content: space-between;
+                margin-top: 6px;
+                color: #666;
+            }
         }
       `}</style>
     </main>

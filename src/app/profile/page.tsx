@@ -429,7 +429,7 @@ export default function ProfilePage() {
           }
 
           .stats-grid {
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
             gap: 8px;
           }
 
@@ -442,9 +442,16 @@ export default function ProfilePage() {
           }
 
           .badges-grid {
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
           }
         }
+
+        @media (max-width: 480px) {
+             .stats-grid {
+                grid-template-columns: 1fr; /* Stack on very small screens */
+             }
+        }
+
       `}</style>
     </div>
   );
