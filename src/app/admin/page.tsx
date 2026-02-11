@@ -32,8 +32,11 @@ export default function AdminDashboard() {
     useEffect(() => {
         if (status === "loading") return;
 
-        // Simple Admin Check (In real app, check role from DB)
-        if (!session || session.user?.name !== "Admin Husband") {
+        // Check for Admin Role
+        // Note: The 'role' property is added to the session in the NextAuth callback (route.ts)
+        const userRole = (session?.user as any)?.role; // Casting to any to avoid type errors if types aren't fully propagated yet
+
+        if (!session || userRole !== "admin") {
             alert("🚫 관리자 전용 구역입니다! (접근 거부)");
             router.push("/");
         } else {
