@@ -125,7 +125,7 @@ export default function Home() {
         </section>
 
         {/* Hot Community Posts Section - Enticing Preview */}
-        <section className="container" style={{ marginTop: "60px", marginBottom: "60px" }}>
+        <section style={{ marginTop: "60px", marginBottom: "60px", width: "100%" }}>
           <h2 className="section-title">🔥 실시간 응급실 현황 (HOT)</h2>
           <div className="hot-posts-wrapper">
             <HotPostsList session={session} />

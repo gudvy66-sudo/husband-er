@@ -16,7 +16,8 @@
     padding: 24px;
     position: relative;
     overflow: hidden;
-    max-width: 800px;
+    width: 100%;
+    /* 부모 컨테이너 너비를 따름 - 로그인 전/후 동일 */
     margin: 0 auto;
     min-height: 380px;
     /* 로그인 전/후 사이즈 통일 */
