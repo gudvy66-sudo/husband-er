@@ -169,18 +169,27 @@ function CommunityContent() {
             align-items: center;
             width: 100%;
             margin-bottom: 24px;
+            gap: 12px;
+            flex-wrap: wrap;
         }
         .page-title {
-            font-size: 1.8rem;
+            font-size: clamp(1.2rem, 4vw, 1.8rem);
             font-weight: 800;
             margin: 0;
+            line-height: 1.3;
         }
         .tabs {
             display: flex;
             gap: 8px;
             margin-bottom: 20px;
             overflow-x: auto;
-            padding-bottom: 5px;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            padding-bottom: 2px;
+        }
+        .tabs::-webkit-scrollbar {
+            display: none;
         }
         .tab {
             padding: 8px 16px;
@@ -192,6 +201,7 @@ function CommunityContent() {
             font-size: 0.9rem;
             white-space: nowrap;
             transition: all 0.2s;
+            flex-shrink: 0;
         }
         .tab.active {
             background: #FF4757;
@@ -271,6 +281,16 @@ function CommunityContent() {
             padding: 40px;
             text-align: center;
             color: #666;
+        }
+
+        @media (max-width: 480px) {
+            .community-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .page-title {
+                font-size: 1.3rem;
+            }
         }
       `}</style>
     </main>
