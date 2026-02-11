@@ -53,27 +53,31 @@ function HotPostsList({ session }: { session: any }) {
     <>
       <ul className="post-list">
         {posts.length > 0 ? posts.map((post) => (
-          <li key={post.id} className="post-item">
-            <span className={`post-badge ${getBadgeType(post.category)}`}>{getKoreanCategory(post.category)}</span>
-            <Link href={session ? `/community/${post.id}` : "/login"} className="post-link">
+          <li key={post.id} className="post-li">
+            <Link href={session ? `/community/${post.id}` : "/login"} className="post-item-link">
+              <span className={`post-badge ${getBadgeType(post.category)}`}>{getKoreanCategory(post.category)}</span>
               <span className="post-title">{post.title}</span>
+              <span className="post-meta">👀 {post.views || 0}</span>
             </Link>
-            <span className="post-meta">댓글 {post.commentCount || 0} · 조회 {post.views || 0}</span>
           </li>
         )) : (
-          <li className="post-item" style={{ justifyContent: 'center', color: '#888' }}>
+          <li className="post-li empty">
             아직 게시글이 없습니다
           </li>
         )}
-        {/* Dummy Secret Post for non-logged in users illusion */}
+
+        {/* Dummy Secret Post */}
         {!session && (
-          <li className="post-item blur-item">
-            <span className="post-badge secret">비밀</span>
-            <span className="post-title">로그인하면 볼 수 있는 19금 생존 비법입니다... (클릭)</span>
-            <span className="post-meta">🔒 잠김</span>
+          <li className="post-li blur-item">
+            <div className="post-item-link dummy">
+              <span className="post-badge secret">비밀</span>
+              <span className="post-title">로그인하면 볼 수 있는 19금 생존 비법입니다...</span>
+              <span className="post-meta">🔒</span>
+            </div>
           </li>
         )}
       </ul>
+
       {!session && (
         <div className="blur-overlay">
           <p>더 많은 생존 꿀팁을 보려면?</p>
@@ -82,6 +86,98 @@ function HotPostsList({ session }: { session: any }) {
           </Link>
         </div>
       )}
+
+      <style jsx>{`
+        .post-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .post-li {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .post-li:last-child {
+            border-bottom: none;
+        }
+        .post-item-link {
+            display: flex;
+            align-items: center;
+            padding: 16px 20px;
+            text-decoration: none;
+            color: inherit;
+            width: 100%;
+            transition: background 0.2s;
+            cursor: pointer;
+        }
+        .post-item-link:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        .post-item-link.dummy {
+            cursor: default;
+            opacity: 0.5;
+            filter: blur(1px);
+        }
+        
+        .post-badge {
+            font-size: 0.75rem;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-weight: 700;
+            margin-right: 12px;
+            min-width: 50px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+        .post-badge.emergency { background: rgba(255, 71, 87, 0.2); color: #FF4757; }
+        .post-badge.warning { background: rgba(255, 165, 2, 0.2); color: #FFA502; }
+        .post-badge.normal { background: rgba(46, 213, 115, 0.2); color: #2ED573; }
+        .post-badge.secret { background: rgba(164, 176, 190, 0.2); color: #A4B0BE; }
+
+        .post-title {
+            flex: 1;
+            color: #eee;
+            margin-right: 10px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-weight: 500;
+        }
+        .post-meta {
+            font-size: 0.8rem;
+            color: #888;
+            white-space: nowrap;
+        }
+        
+        .post-li.empty {
+            padding: 20px;
+            text-align: center;
+            color: #888;
+        }
+
+        .blur-overlay {
+            margin-top: 20px;
+            text-align: center;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+        }
+        .blur-overlay p {
+            margin-bottom: 12px;
+            color: #ccc;
+        }
+        
+        @media (max-width: 480px) {
+            .post-item-link {
+                 padding: 14px 16px;
+            }
+            .post-title {
+                font-size: 0.95rem;
+            }
+        }
+      `}</style>
     </>
   );
 }
