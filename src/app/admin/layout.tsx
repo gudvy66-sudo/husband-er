@@ -42,7 +42,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     }
 
     // Show loading or nothing while checking auth
-    if (status === "loading" || !session) return null;
+    if (status === "loading") return null;
+
+    // Strict Auth Check during render
+    if (!session || (session.user as any).role !== "admin") {
+        return null; // Don't render anything until redirected
+    }
 
     return (
         <div className="admin-wrapper">

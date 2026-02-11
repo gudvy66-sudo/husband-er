@@ -80,7 +80,21 @@ function WritePageContent() {
         e.preventDefault();
 
         if (!title.trim() || !content.trim()) {
-            alert("제목과 내용을 모두 입력해주세요.");
+            alert(" 제목과 내용을 모두 입력해주세요.");
+            return;
+        }
+
+        const { checkProfanity } = await import("@/utils/profanity");
+
+        const titleCheck = checkProfanity(title);
+        if (titleCheck.hasProfanity) {
+            alert(`🚨 제목에 건전하지 못한 단어가 포함되어 있습니다.\n(검출된 단어: ${titleCheck.badWord})`);
+            return;
+        }
+
+        const contentCheck = checkProfanity(content);
+        if (contentCheck.hasProfanity) {
+            alert(`🚨 내용에 건전하지 못한 단어가 포함되어 있습니다.\n(검출된 단어: ${contentCheck.badWord})`);
             return;
         }
 

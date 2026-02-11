@@ -153,6 +153,15 @@ export default function PostDetail({ params }: { params: Promise<{ id: string }>
   const handleCommentSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!commentText.trim()) return;
+
+    const { checkProfanity } = await import("@/utils/profanity");
+    const profanityCheck = checkProfanity(commentText);
+
+    if (profanityCheck.hasProfanity) {
+      alert(`🚨 댓글에 건전하지 못한 단어가 포함되어 있습니다.\n(검출된 단어: ${profanityCheck.badWord})`);
+      return;
+    }
+
     if (!session?.user) {
       alert("로그인이 필요합니다.");
       return;
