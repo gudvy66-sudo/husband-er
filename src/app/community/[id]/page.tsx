@@ -231,6 +231,30 @@ export default function PostDetail({ params }: { params: Promise<{ id: string }>
     alert("👍 댓글에 공감했습니다! (MVP 기능)");
   };
 
+  const handleCommentEdit = async (commentId: string, currentContent: string) => {
+    const newContent = prompt("댓글을 수정하세요:", currentContent);
+    if (newContent === null || newContent.trim() === "") return;
+    if (newContent === currentContent) return;
+
+    try {
+      const { doc, updateDoc, serverTimestamp } = await import("firebase/firestore");
+      const { db } = await import("@/lib/firebase");
+      const postId = unwrappedParams.id;
+
+      const commentRef = doc(db, "posts", postId, "comments", commentId);
+      await updateDoc(commentRef, {
+        content: newContent,
+        updatedAt: serverTimestamp() // Optional: track updates
+      });
+
+      // Update local state (Optimistic UI)
+      setComments(prev => prev.map(c => c.id === commentId ? { ...c, content: newContent } : c));
+    } catch (error) {
+      console.error("Error editing comment:", error);
+      alert(`댓글 수정 실패: ${error}`);
+    }
+  };
+
   const handleCommentDelete = async (commentId: string) => {
     if (!confirm("댓글을 삭제하시겠습니까?")) return;
 
@@ -249,7 +273,7 @@ export default function PostDetail({ params }: { params: Promise<{ id: string }>
       alert("댓글이 삭제되었습니다.");
     } catch (error) {
       console.error("Error deleting comment:", error);
-      alert("댓글 삭제 실패");
+      alert(`댓글 삭제 실패: ${error}`);
     }
   };
 
@@ -408,13 +432,22 @@ export default function PostDetail({ params }: { params: Promise<{ id: string }>
                   <div className="comment-actions">
                     <button className="btn-like-small" onClick={() => handleCommentLike(comment.id)}>👍 공감</button>
                     {session?.user && (session.user as any).id === comment.authorId && (
-                      <button
-                        className="btn-delete-small"
-                        onClick={() => handleCommentDelete(comment.id)}
-                        style={{ color: '#ff4757', marginLeft: 'auto' }}
-                      >
-                        🗑️ 삭제
-                      </button>
+                      <div style={{ marginLeft: 'auto', display: 'flex', gap: '8px' }}>
+                        <button
+                          className="btn-edit-small"
+                          onClick={() => handleCommentEdit(comment.id, comment.content)}
+                          style={{ color: '#aaa' }}
+                        >
+                          ✏️ 수정
+                        </button>
+                        <button
+                          className="btn-delete-small"
+                          onClick={() => handleCommentDelete(comment.id)}
+                          style={{ color: '#ff4757' }}
+                        >
+                          🗑️ 삭제
+                        </button>
+                      </div>
                     )}
                   </div>
                 </div>
