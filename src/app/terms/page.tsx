@@ -59,13 +59,13 @@ export default function TermsPage() {
                                 제 3 조 (게시물의 관리 및 책임)
                             </h3>
                         </div>
-                        <div className="space-y-2 text-gray-300 max-w-2xl mx-auto text-left sm:text-center">
+                        <div className="space-y-2 text-gray-300 max-w-2xl mx-auto">
                             <p>1. 회원이 작성한 게시물에 대한 모든 책임은 회원 본인에게 있습니다.</p>
                             <p>2. 다음 각 호에 해당하는 게시물은 <span className="text-red-400">사전 통보 없이 삭제</span>되거나 작성이 금지될 수 있습니다.</p>
-                            <ul className="list-none space-y-1 text-gray-400 mt-2 bg-[#000]/30 p-4 rounded-lg inline-block text-left mx-auto">
-                                <li>🚫 아내를 지나치게 찬양하여 타 회원의 사기를 저하시키는 글 (기만 행위)</li>
+                            <ul className="list-none space-y-1 text-gray-400 mt-2 bg-[#000]/30 p-4 rounded-lg inline-block mx-auto">
+                                <li>🚫 아내를 지나치게 찬양하여 타 회원의 사기를 저하시키는 글</li>
                                 <li>🚫 실명, 주소 등 개인 신상을 노출하여 익명성을 해치는 글</li>
-                                <li>🚫 특정인에 대한 인신공격, 욕설 등비매너 행위</li>
+                                <li>🚫 특정인에 대한 인신공격, 욕설 등 비매너 행위</li>
                                 <li>🚫 광고, 도배, 스팸성 게시물</li>
                             </ul>
                         </div>
